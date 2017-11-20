@@ -1,0 +1,391 @@
+﻿@using Mugi.Web.Model.ViewModel
+@using Mugi.Web.StaticValue
+@model List<OrderedViewModel>
+
+
+@{
+    ViewData["Title"] = "ListOrder";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .ui.collapsing.table.custom {
+        width: 100%;
+    }
+
+    .center.custom {
+        text-align: center;
+    }
+
+    .ui.vertical.menu.custom {
+        width: 100%;
+    }
+
+    .ui.center.aligned.vertical.menu.custom {
+        overflow-y: scroll;
+        height: 75vh;
+    }
+</style>
+<div class="twelve wide column">
+    <div class="ui small stackable menu">
+        <a class="item" id="ReturnProduct">Trả hàng</a>
+        <a class="item" id="ChangeStatus">Xử lí ĐH</a>
+        <a class="item" id="Deliver">Chọn người giao hàng</a>
+        <a class="item" id="Complete">Hoàn tất ĐH</a>
+        <a class="item" id="Export">In hóa đơn</a>
+        <a class="item" id="deny">Hủy ĐH</a>
+
+
+        <div class="right item" id="Filter">
+            <div class="ui dropdown" id="filterOrder">
+                Lọc theo
+                <i class="ui dropdown icon"></i>
+                <div class="menu">
+                    <div class="item report" id="all" data-value="all">
+                        <span class="text">Tất cả</span>
+                    </div>
+
+                    <div class="item report" id="unassign" data-value="unassign">
+                        <span class="text">Chưa phân công</span>
+                    </div>
+                    <div class="item report" id="assigned" data-value="assigned">
+                        <span class="text">Đã phần công</span>
+                    </div>
+                    <div class="item report" id="completed" data-value="completed">
+                        <span class="text">Đơn hàng đã hoàn tất</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h2 class="ui header center custom">Danh sách đơn hàng</h2>
+    <div class="ui center aligned vertical accordion menu custom" id="scroll">
+        <div class="ui small header item">
+            <a class="title">
+                <div class="ui six column stackable grid">
+                    <div class="column">MĐH</div>
+                    <div class="column">Tên người đặt</div>
+                    <div class="column">Ngày đặt</div>
+                    <div class="column">SLSP</div>
+                    <div class="column">HTTT</div>
+                    <div class="column">Tình trạng</div>
+                    @*<div class="column">Task</div>*@
+                </div>
+            </a>
+        </div>
+        <div id="PartialView">
+            @foreach (var item in Model)
+            {
+                <div class="item field-order" id="@item.OrderId">
+                    <div class="title">
+                        <div class="ui six column stackable grid">
+                            <div class="column">@item.OrderId</div>
+                            <div class="column">@item.CustomerName</div>
+                            <div class="column">@item.CreatedDate</div>
+                            <div class="column">@item.NumberProduct</div>
+                            <div class="column">
+                                @switch (item.PaymentType)
+                                {
+                                    case "PayPal":
+                                        <p>PayPal</p>
+                                        break;
+                                    case "ThanhToanKhiGiaoHang":
+                                        <p>Khi nhận</p>
+                                        break;
+                                    default:
+                                        <p>Ngân Lượng</p>
+                                        break;
+                                }
+                            </div>
+                            <div class="column">
+                                @switch (@item.Status)
+                                {
+                                    case StaticValue.STATUS_HANDLING:
+                                        <div class="column status" data-value="@item.Status">Chưa XL</div>
+                                        break;
+                                    case StaticValue.STATUS_CONFIRMED:
+                                        <div class="column status" data-value="@item.Status">Đã xác nhận</div>
+                                        break;
+                                    case StaticValue.STATUS_DENIED:
+                                        <div class="column status" data-value="@item.Status">Đã hủy</div>
+                                        break;
+                                    case StaticValue.STATUS_DELIVERING:
+                                        <div class="column status" data-value="@item.Status">Đang chuyển</div>
+                                        break;
+                                    case StaticValue.STATUS_COMPLETED:
+                                        <div class="column status" data-value="@item.Status">Hoàn tất</div>
+                                        break;
+                                    default:
+                                        <div class="column status" data-value="none"></div>
+                                        break;
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <table class="ui center aligned collapsing table custom">
+                            <thead>
+                                <tr>
+                                    <th>Tên mặt hàng</th>
+                                    <th>Thuộc tính</th>
+                                    <th>Đơn giá</th>
+                                    <th>Số lượng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var subItem in item.SubProductOrderedViewModels)
+                                {
+                                    var product = item.ProductOrderedViewModels.Where(x => x.ProductId == subItem.ProductId).SingleOrDefault();
+                                    <tr>
+                                        <td>@product.ProductName</td>
+                                        <td>
+                                            @foreach (var property in subItem.PropertyDetails)
+                                            {
+                                                <p>@property.PropertyName : @property.PropertyValue</p>
+                                            }
+                                        </td>
+                                        <td>@product.Price</td>
+                                        <td>@subItem.NumberSubProduct</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<form id="FormSubmit" method="get">
+    <input type="hidden" name="OrderId" id="OrderId" />
+</form>
+@{ var status = TempData["ListOrder"] as string;}
+@switch (status)
+{
+    case "ReturnProductFull":
+        <div class="ui basic modal">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p>Đơn hàng đã trả hết!</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+    case "DenySuccess":
+        <div class="ui basic modal">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p>Hủy đơn hàng thành công!</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+    case "ConfirmSuccess":
+        <div class="ui basic modal">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p>Đơn hàng đã được xác nhận!</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+
+    case "DeliverSuccess":
+        <div class="ui basic modal">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p>Phân công người giao hàng thành công!</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+    case "ReturnProductFailed":
+        <div class="ui basic modal">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p>Hóa đơn chưa được thanh toán!</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+    case "ChangeStatusFailed":
+        <div class="ui basic modal">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p>Hóa đơn đã được xử lí!</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+    case "ExportFailed":
+        <div class="ui basic modal">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p>Xuất hóa đơn thất bại!</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+    case "CompleteSuccess":
+        <div class="ui basic modal">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p>Hóa đơn đã hoàn tất!</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+    case "CompleteFailed":
+        <div class="ui basic modal">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p>Hóa đơn chưa được giao hoặc đã hoàn tất !</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+}
+@section scripts
+    {
+    <script>
+        function FindIdAndSubmit(action) {
+        var id = 0;
+            $('.field-order').each(function () {
+            if ($(this).hasClass('active')) {
+                id = parseInt($(this).attr('id'));
+            }
+        })
+            if (id != 0 && !isNaN(id)) {
+                $('#OrderId').val(id);
+                $('#FormSubmit').attr('action', action);
+                $('#FormSubmit').submit();
+        }
+    }
+        $(document).ready(function () {
+            $('.ui.modal').modal('show');
+            $('#filterOrder').dropdown({
+
+            onChange: function (value, text, $choice) {
+                console.log(value);
+                $.ajax({
+                    url: "@Url.Action("FilterOrder","Staff")",
+                    data: { "query": value },
+                    type: 'POST',
+
+                    success: function (data) {
+                        $('#PartialView').html(data);
+                    },
+                    error: function () {
+                        console.log('error');
+                    }
+                })
+                }
+        });
+            $('.ui.accordion').accordion();
+
+            $('#deny').on('click', function () {
+                FindIdAndSubmit('@Url.Action("DenyOrder", "Staff")');
+            })
+
+            $('#Deliver').on('click', function () {
+                FindIdAndSubmit('@Url.Action("Deliver", "Staff")');
+            })
+
+            $('#Export').on('click', function () {
+                FindIdAndSubmit('@Url.Action("Export", "Staff")');
+            })
+
+            $('#ChangeStatus').on('click', function () {
+                 FindIdAndSubmit('@Url.Action("OrderDetails", "Staff")');
+            })
+
+             $('#Complete').on('click', function () {
+                 FindIdAndSubmit('@Url.Action("CompleteOrder", "Staff")');
+            })
+
+
+            $('#ReturnProduct').on('click', function () {
+                 FindIdAndSubmit('@Url.Action("ReturnProduct", "Staff")');
+            })
+
+            $(document).on('click', '.field-order', function () {
+                $(this).addClass('active');
+                $(this).siblings().removeClass('active');
+            })
+        })
+
+    </script>
+}
+

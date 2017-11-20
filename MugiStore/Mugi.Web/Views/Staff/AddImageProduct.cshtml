@@ -1,0 +1,267 @@
+﻿
+@using Mugi.Web.Model.ViewModel
+@model AddImageProductViewModel
+
+@{
+    ViewData["Title"] = "AddImageProduct";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .ui.medium.image.custom {
+        width: 350px;
+    }
+
+    .error {
+        color: red;
+    }
+
+    .non-max-with {
+        max-width: none;
+    }
+    /*set a border on the images to prevent shifting*/
+    #gallery_01 img {
+        border: 2px solid white;
+    }
+    /*Change the colour*/
+
+    .active img {
+        border: 2px solid #333 !important;
+    }
+
+    .ui.tiny.image.custom {
+        width: 60px;
+    }
+
+    .ui.medium.image.custom {
+        width: 350px;
+    }
+
+    .container.custom {
+        text-align: center;
+    }
+</style>
+
+<div class="twelve wide column">
+    <form asp-action="AddImageProduct" asp-controller="Staff" method="post" enctype="multipart/form-data">
+        <input asp-for="Id" type="hidden" />
+        <div class="ui grid stackable">
+            <div class="sixteen wide column center aligned">
+                <h2 class="ui header">
+                    Nhập ảnh cho sản phẩm @Model.ProductName
+                </h2>
+            </div>
+            <div class="eight wide column">
+                <div class="container">
+                    @*~/images/image1.png*@
+                    <div id="gallery_01" style="text-align:center">
+                        @for (int i = 1; i <= Model.ImageProducts.Count; i++)
+                        {
+                            var image = Model.ImageProducts[i - 1];
+                            string active = "";
+                            if (i == 1) { active = "active"; }
+                            <a id="@image.Id" class="@active ui tiny image custom imageDelete" href="#" data-image="@image.Name" data-zoom-image="@image.Name">
+                                <img id="zoom_0@i" src="@image.Name" />
+                            </a>
+                        }
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="eight wide column center aligned">
+                <div class="field">
+                    <label asp-for="Image">
+                        <div class="ui mini button">
+                            brower
+                        </div>
+                    </label>
+
+                    <input class="transition hidden" asp-for="Image" type="file" onchange="fileCheck(this);" />
+                    <span asp-validation-for="Image" class="error"></span>
+                </div>
+                <div class="field">
+                    <label>(Ảnh hình nên vuông)</label>
+                </div>
+                <div class="field">
+                    <div class="container custom">
+                        <div class="ui medium image custom">
+                            <img id="image" style="margin:auto" class="zoomContainer"
+                                 src="@Model.ImageProducts.FirstOrDefault().Name"
+                                 data-zoom-image="@Model.ImageProducts.FirstOrDefault().Name" alt="your image" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sixteen wide column center aligned">
+                <button class="ui black button">Submit</button>
+                <button class="ui black button" id="DeleteBtn" type="button">Delete</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<div class="ui basic modal confirm">
+    <div class="ui icon header">
+        <i class="archive icon"></i>
+        Messages
+    </div>
+    <div class="content" style="text-align: center">
+        <p>Xác nhận xóa</p>
+    </div>
+    <div class="actions" style="text-align: center">
+        <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Ok
+        </div>
+        <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+        </div>
+    </div>
+</div>
+<div class="ui basic modal notification">
+    <div class="ui icon header">
+        <i class="archive icon"></i>
+        Messages
+    </div>
+    <div class="content" style="text-align: center">
+        <p id="Message">Xóa ảnh thành công!</p>
+    </div>
+    <div class="actions" style="text-align: center">
+        <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Ok
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/js/jquery.elevatezoom.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            $('#DeleteBtn').on('click', function () {
+                var images = $('.imageDelete');
+                for (var i = 0; i < images.length; i++) {
+                    var image = images[i];
+                    if ($(image).hasClass('active')) {
+                         $('.ui.modal.confirm').modal({
+                        closable: false,
+                        onApprove: function () {
+                            DeteleImage(image);
+                        },
+                        onDeny: function () {
+                            $(this).modal('hide');
+                        }
+                        }).modal('show');
+
+                        return;
+                    }
+                }
+            })
+        })
+
+        function DeteleImage(image) {
+             var imageId = parseInt($(image).attr('id'));
+                        $.ajax({
+                            url: "@Url.Action("DeleteImageProduct","Staff")",
+                            data: { imageId: imageId },
+                            type: 'POST'
+                        }).done(function (data) {
+                            switch (data) {
+                                case 'Success':
+                                    $('.ui.basic.modal.notification').modal({
+                                        closable: false,
+                                        onApprove: function () {
+                                            location.reload();
+                                        }
+                                    }).modal('show');
+
+                                    break;
+                                case 'Failed':
+                                    console.log('delete image failed');
+                                    break;
+                            }
+
+                        }).fail(function () {
+                            console.log('delete image failed');
+                        })
+        }
+        $(".zoomContainer").elevateZoom({
+            constrainType: "height",
+            constrainSize: 350,
+            zoomType: "lens",
+            containLensZoom: true,
+            gallery: 'gallery_01',
+            cursor: 'pointer',
+            galleryActiveClass: "active"
+        }); //pass the images to Fancybox
+        $(document).ready(function () {
+            $('#gallery_01 .image').click(function () {
+                $(this).transition({
+                    animation: 'pulse',
+                    interval: 200
+                });
+            })
+        })
+        function fileCheck(input) {
+            var fileExtension = ['jpeg', 'jpg', 'png', 'gif', 'bmp'];
+            if ($.inArray($(input).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                alert("Only '.jpeg','.jpg', '.png', '.gif', '.bmp' formats are allowed.");
+            } else {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        $('#image')
+                            .attr('src', e.target.result)
+                            .width(350)
+                            .height(350);
+                    };
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+
+            }
+        }
+    </script>
+
+}
+
+
+
+@*<form method="post" enctype="multipart/form-data">
+        <input type="file" id="files"
+               name="files" multiple />
+        <input type="button"
+               id="upload"
+               value="Upload Selected Files" />
+    </form>*@
+
+
+@*<script>
+        $(document).ready(function () {
+            $("#upload").click(function (evt) {
+                var fileUpload = $("#files").get(0);
+                var files = fileUpload.files;
+                var data = new FormData();
+                for (var i = 0; i < files.length; i++) {
+                    data.append(files[i].name, files[i]);
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UploadFilesAjax", "Staff")",
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (message) {
+                        alert(message);
+                    },
+                    error: function () {
+                        alert("There was error uploading files!");
+                    }
+                });
+            })
+        });
+
+    </script>*@

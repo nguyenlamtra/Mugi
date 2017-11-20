@@ -1,0 +1,209 @@
+﻿@model Mugi.Web.Model.ViewModel.AddPromotionViewModel
+
+@{
+    ViewData["Title"] = "AddPromotion";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .ui.segment.custom {
+        min-height: 75vh;
+    }
+
+    .ui.container.scroll {
+        overflow-y: scroll;
+        max-height:60vh;
+    }
+
+    table.ui.basic.table {
+        height: 100px;
+    }
+
+    input {
+        max-width: none;
+    }
+
+    .error{
+        color:red;
+    }
+</style>
+
+<div class="twelve wide column">
+    <form asp-action="AddPromotion" asp-controller="Staff" method="post" enctype="multipart/form-data">
+        <div class="ui stackable grid">
+            <div class="eight wide column">
+                <div class="ui segment custom">
+                    <div class="item">
+                        <div class="ui search layout">
+                            <div class="ui icon input" style=" width:100%">
+                                <input class="prompt" type="text" placeholder="Search...">
+                                <i class="search icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui container">
+                        <div class="ui container scroll" style="margin-top: 10px;">
+                            <table class="ui basic table">
+                                <thead>
+                                    <tr class="ui center aligned ">
+                                        <th>
+                                            Tên sản phẩm
+                                        </th>
+                                        <th>
+                                            Giá
+                                        </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Products)
+                                    {
+                                        <tr class="ui center aligned product" id="@item.Id">
+                                            <td class="ProductName">
+                                                @item.ProductName
+                                            </td>
+                                            <td>
+                                                @item.Price
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+            <div class="eight wide column">
+                <div class="ui segment custom">
+                    <div class="ui header center aligned">
+                        <h3>Thông tin khuyến mãi</h3>
+                    </div>
+
+                    <div class="ui form">
+                        <div class="field">
+                            <label asp-for="BeginDay">Ngày bắt đầu</label>
+                            <div class="ui calendar" id="rangestart">
+                                <div class="ui input left icon">
+                                    <i class="calendar icon"></i>
+                                    <input asp-for="BeginDay" type="text" placeholder="Ngày bắt đầu">
+                                </div>
+                            </div>
+                            <span asp-validation-for="BeginDay" class="error"></span>
+                        </div>
+                        <div class="field">
+                            <label asp-for="EndDay">Ngày kết thúc</label>
+                            <div class="ui calendar" id="rangeend">
+                                <div class="ui input left icon">
+                                    <i class="calendar icon"></i>
+                                    <input asp-for="EndDay" type="text" placeholder="Ngày kết thúc">
+                                </div>
+                            </div>
+                            <span asp-validation-for="EndDay" class="error"></span>
+                        </div>
+                        <div class="field">
+                            <label asp-for="PromotionPercent">Phần trăm khuyến mãi</label>
+                            <input asp-for="PromotionPercent" type="text" class="insert-percent" />
+                            <span asp-validation-for="PromotionPercent" class="error"></span>
+                        </div>
+                        <input type="hidden" asp-for="ProductIds" multiple />
+                        <span asp-validation-for="ProductIds" class="error"></span>
+                    </div>
+
+                    </div>
+                </div>
+                <div class="sixteen wide column center aligned">
+                    <button type="submit" id="submit" class="ui button">Submit</button>
+                </div>
+        </div>
+    </form>
+</div>
+@{ string status = TempData["AddPromotion"] as string;}
+@switch (status)
+{
+    case "Success":
+        <div class="ui basic modal notification">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p id="Message">Thêm thành công!</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+    case "Failed":
+        <div class="ui basic modal notification">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p id="Message">Thêm thất bại!</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+}
+@section scripts{
+    <script>
+        $(document).ready(function () {
+        var array = [];
+            $('.ProductName').each(function () {
+            array.push({ title: $(this).text().trim() });
+            });
+            //console.log(array);
+            var content = array;
+            $('.ui.search')
+                .search({
+                    source: content
+                })
+                ;
+            $('.product').on('click', function () {
+                var arr = [];
+
+                if ($(this).hasClass('active')) {
+                    $(this).removeClass('active');
+
+                } else {
+                    $(this).addClass('active');
+                }
+                $('.product').each(function () {
+                    if ($(this).hasClass('active')) {
+                        var id = parseInt($(this).attr('id'));
+                        arr.push(id);
+                    }
+                })
+                $('#ProductIds').val(arr);
+
+            })
+            $('#rangestart').calendar({
+                type: 'date',
+                endCalendar: $('#rangeend')
+            });
+            $('#rangeend').calendar({
+                type: 'date',
+                startCalendar: $('#rangestart')
+            });
+            $('#rangestart').calendar('clear')
+            $('#rangeend').calendar('clear')
+          
+        })
+
+    </script>
+}

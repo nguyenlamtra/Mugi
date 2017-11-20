@@ -1,0 +1,111 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81;</PackageTargetFallback>
+    <AssemblyName>Mugi.Web</AssemblyName>
+    <StartupObject></StartupObject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="6.1.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="3.1.0" />
+    <PackageReference Include="dropzone" Version="4.2.0" />
+    <PackageReference Include="MailKit" Version="1.20.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Views\Customer\ChangePassword.cshtml" />
+    <None Include="Views\Customer\CustomerProfile.cshtml" />
+    <None Include="Views\Customer\LoginCustomer.cshtml" />
+    <None Include="Views\Customer\RegisterCustomer.cshtml" />
+    <None Include="Views\Home\About.cshtml" />
+    <None Include="Views\Home\Contact.cshtml" />
+    <None Include="Views\Home\Index.cshtml" />
+    <None Include="Views\Order\Error.cshtml" />
+    <None Include="Views\Order\ListOrdered.cshtml" />
+    <None Include="Views\Order\Mail.cshtml" />
+    <None Include="Views\Order\OrderDetails.cshtml" />
+    <None Include="Views\Order\Pay.cshtml" />
+    <None Include="Views\Order\Payment.cshtml" />
+    <None Include="Views\Order\Success.cshtml" />
+    <None Include="Views\Product\AboutUs.cshtml" />
+    <None Include="Views\Product\FeedBack.cshtml" />
+    <None Include="Views\Product\HomePage.cshtml" />
+    <None Include="Views\Product\Index.cshtml" />
+    <None Include="Views\Product\Map.cshtml" />
+    <None Include="Views\Product\ProductDetails.cshtml" />
+    <None Include="Views\Product\ShopCart.cshtml" />
+    <None Include="Views\Product\_Product.cshtml" />
+    <None Include="Views\Shared\Components\Advertisement\Advertisement.cshtml" />
+    <None Include="Views\Shared\EmptyLayout.cshtml" />
+    <None Include="Views\Shared\Error.cshtml" />
+    <None Include="Views\Shared\Layout.cshtml" />
+    <None Include="Views\Shared\_DashboardLayout.cshtml" />
+    <None Include="Views\Shared\_EmptyLayout.cshtml" />
+    <None Include="Views\Shared\_HomePageLayout.cshtml" />
+    <None Include="Views\Shared\_Layout.cshtml" />
+    <None Include="Views\Shared\_MainLayout.cshtml" />
+    <None Include="Views\Shared\_ProductDetailLayout.cshtml" />
+    <None Include="Views\Shared\_StaffLayout.cshtml" />
+    <None Include="Views\Shared\_ValidationScriptsPartial.cshtml" />
+    <None Include="Views\Staff\AddAdvertisement.cshtml" />
+    <None Include="Views\Staff\AddCategory.cshtml" />
+    <None Include="Views\Staff\AddImageProduct.cshtml" />
+    <None Include="Views\Staff\AddProduct.cshtml" />
+    <None Include="Views\Staff\AddPromotion.cshtml" />
+    <None Include="Views\Staff\AddPropertyDetails.cshtml" />
+    <None Include="Views\Staff\AddSubCategory.cshtml" />
+    <None Include="Views\Staff\AddSubProduct.cshtml" />
+    <None Include="Views\Staff\ChangePassword.cshtml" />
+    <None Include="Views\Staff\Deliver.cshtml" />
+    <None Include="Views\Staff\Export.cshtml" />
+    <None Include="Views\Staff\GoodsReceipt.cshtml" />
+    <None Include="Views\Staff\Index.cshtml" />
+    <None Include="Views\Staff\InsertBasic.cshtml" />
+    <None Include="Views\Staff\ListOrder.cshtml" />
+    <None Include="Views\Staff\ListProduct.cshtml" />
+    <None Include="Views\Staff\LoginStaff.cshtml" />
+    <None Include="Views\Staff\OrderDetails.cshtml" />
+    <None Include="Views\Staff\RegisterStaff.cshtml" />
+    <None Include="Views\Staff\ReturnProduct.cshtml" />
+    <None Include="Views\Staff\StaffProfile.cshtml" />
+    <None Include="Views\Staff\UpdateProduct.cshtml" />
+    <None Include="Views\Staff\_GoodsReceipt.cshtml" />
+    <None Include="Views\Staff\_ListOrder.cshtml" />
+    <None Include="Views\_ViewImports.cshtml" />
+    <None Include="Views\_ViewStart.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Models\" />
+    <Folder Include="Reports\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mugi.Domain\Mugi.Domain.csproj" />
+    <ProjectReference Include="..\Mugi.Service\Mugi.Service.csproj" />
+  </ItemGroup>
+
+</Project>

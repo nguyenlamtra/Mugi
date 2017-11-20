@@ -1,0 +1,75 @@
+﻿@using Mugi.Web.Model
+@model ProductForGoodsReceiptModel
+
+<div class="ui segment center aligned">
+    <div class="container productId" id="@Model.Id">
+        <div class="field">
+            <h3 class="ui header">Tên sản phẩm: @Model.ProductName</h3>
+        </div>
+        <div class="two fields">
+
+            <div class="field">
+                Đơn Giá nhập
+                <div class="field">
+                    <input type="text" class="priceInput insert-price" />
+                </div>
+            </div>
+            <div class="field">
+                Đơn giá bán
+                <div class="field">
+                    <input type="text"  class="priceOutput insert-price" />
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <h4>Danh sách sản phẩm con</h4>
+        </div>
+        <div class="ui segment field">
+            <table class="ui very basic collapsing celled table">
+                <thead>
+                    <tr>
+                        @foreach (var property in Model.Properties)
+                        {
+                            <th>@property.PropertyName</th>
+                        }
+                        <th class="one wide aligned">Tồn</th>
+                        <th class="two wide aligned">SL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var subProduct in Model.SubProducts)
+                    {
+                        <tr class="rows subProductId" id="@subProduct.Id">
+                            @foreach (var property in Model.Properties)
+                            {
+                                <td>@subProduct.PropertyDetails.Where(y => y.Property.Id == property.Id).Select(x => x.PropertyValue).SingleOrDefault()</td>
+                            }
+                            <td>@subProduct.ProductLeft</td>
+                            <td>
+                                <div class="field">
+                                    <input type="text" class="quantity insert-product" />
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+<script>
+    $(document).ready(function () {
+        $('.insert-price').attr('maxlength', '10');
+        $('.insert-price').keypress(function (event) {
+            return event.charCode >= 48 && event.charCode <= 57
+        })
+        $('.insert-product').attr('maxlength', '4');
+        $('.insert-product').keypress(function (event) {
+            return event.charCode >= 48 && event.charCode <= 57
+        })
+    })
+    
+</script>

@@ -1,0 +1,326 @@
+﻿@using Mugi.Web.Model.ViewModel
+@model List<ShopCartViewModel>
+@{
+    ViewBag.Title = "ShopCart";
+    Layout = "~/Views/Shared/_HomePageLayout.cshtml";
+}
+<style>
+    .ui.grid {
+        padding: 0px !important;
+    }
+
+    .ui.twelve.wide.column.segment {
+        margin: 0px;
+    }
+
+    #totalMoney {
+        border-top: none;
+    }
+
+    .error.message.custom {
+        text-align: center;
+        color: red;
+    }
+
+    .error {
+        color: red;
+    }
+
+    .center.custom {
+        text-align: center;
+    }
+</style>
+
+
+<div class="ui sixteen wide column">
+    <h2 class="ui center aligned icon header">
+        <i class="circular add to cart icon"></i>
+        Giỏ hàng của bạn
+    </h2>
+
+    @{
+        string temp = TempData["LoginCustomer"] as string;
+        string error = TempData["ShopCart"] as string;
+    }
+    @if (temp == "RequestLogin")
+    {
+        <h3 class="error center custom">Đặt hàng thành công!</h3>
+    }
+    else
+    {
+        <h3 class="error center custom"></h3>
+    }
+    @switch (error)
+    {
+        case "sessionempty":
+        case "cartempty":
+            <h3 class="error center custom">Giỏ hàng trống</h3>
+            break;
+        default:
+            break;
+
+    }
+    <br /><br /><br />
+
+    <div class="ui item">
+        <table class="ui very basic table" style="width:100%">
+            <thead>
+                <tr>
+                    <th class="center aligned">
+                        <div id="LeadCheckBox" class="ui checkbox">
+                            <input type="checkbox">
+                            <label></label>
+                        </div>
+                    </th>
+                    <th style="width:60%" class="center aligned"><h3>Sản phẩm</h3></th>
+                    <th class="center aligned"><h3>Đơn giá</h3></th>
+                    <th class="center aligned"><h3>Số lượng</h3></th>
+                    <th class="center aligned"><h3>Thành tiền</h3></th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="subProduct" id="@item.SubProductId">
+                        <td class="center align">
+                            <div class="ui checkbox">
+                                <input type="checkbox">
+                                <label></label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="ui items">
+                                <div class="item">
+
+                                    <div class="ui small image">
+                                        <img src="@item.ImageUrl">
+                                    </div>
+                                    <div class="middle aligned content">
+                                        <div class="header">
+                                            <h4>
+                                                @item.ProductName
+                                            </h4>
+
+                                        </div>
+                                        <div class="meta">
+                                            @foreach (var subItem in item.PropertyDetails)
+                                            {
+                                                <p>@subItem.Property.PropertyName : @subItem.PropertyValue</p>
+                                            }
+                                            @if (item.PromotionPercent != 0)
+                                            {
+                                                <p data-value="@item.PromotionPercent" class="promotion">Khuyến mãi: @item.PromotionPercent%</p>
+                                            }
+                                        </div>
+                                        <div class="description">
+                                            <p></p>
+                                        </div>
+
+                                    </div>
+                                    <div style="margin:auto" class="compact black mini ui floated button delete removeBtn">
+                                        <i class="ui remove icon" style="margin:0px"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </td>
+                        <td class="center aligned priceProduct">
+                            @item.Price
+                        </td>
+                        <td class="center aligned">
+                            <div class="ui scrolling dropdown">
+                                <div class="text">Số lượng</div>
+                                <i class="dropdown icon"></i>
+                                <div class="menu">
+                                    @for (int i = 1; i <= item.ProductLeft; i++)
+                                    {
+                                        if (i == item.ProductOrder)
+                                        {
+                                            <div class="item active selected" data-value="@i">@i</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="item" data-value="@i">@i</div>
+                                        }
+
+                                    }
+                                </div>
+                            </div>
+                        </td>
+                        <td class="center aligned totalPrice">
+                            0
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3" class="center aligned">
+
+                    </th>
+                    <th colspan="1" class="center aligned">
+                        <h3>
+                            Tổng tiền:
+                        </h3>
+                    </th>
+
+                    <th class="center aligned"><h3 id="sumMoney">0</h3></th>
+                </tr>
+                <tr>
+                    <th colspan="3" class="right aligned" id="totalMoney">
+
+                    </th>
+
+                    <th class="center aligned" colspan="2">
+                        <a href="@Url.Action("Payment","Order")" class="ui black button" id="OrderBtn">
+                            Tiến hành đặt hàng
+                        </a>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+
+        function caculateMoney() {
+            var $listSubProducts = $('.subProduct');
+            var sum = 0;
+            for (var i = 0; i < $listSubProducts.length; i++) {
+                var subProduct = $($listSubProducts[i]);
+                if (subProduct.find('.ui.checkbox').checkbox('is checked')) {
+                    var price = parseInt(subProduct.find('.priceProduct').text());
+                    var dropdown = subProduct.find('.ui.scrolling.dropdown');
+                    var number = dropdown.dropdown('get value');
+                    if (number == '') { number = 0; }
+                    var totalPrice = subProduct.find('.totalPrice');
+                    var promotion = parseInt(subProduct.find('.promotion').data('value'));
+                    if (isNaN(promotion))
+                        totalPrice.text(number * price);
+                    else
+                        totalPrice.text((number * price) - (number * price * promotion) / 100);
+
+                    sum += isNaN(promotion) ? (number * price) : ((number * price) - (number * price * promotion) / 100);
+                } else {
+                    var totalPrice = subProduct.find('.totalPrice');
+                    totalPrice.text(0);
+                }
+            }
+
+            $('#sumMoney').text(sum);
+        }
+
+        $(document).ready(function () {
+            $('.ui.basic.modal')
+                .modal('show')
+                ;
+
+            $('.ui.checkbox').checkbox('check');
+
+            $('#LeadCheckBox').checkbox({
+                onChecked: function () {
+                    $('.ui.checkbox').checkbox('check');
+                },
+                onUnchecked: function () {
+                    $('.ui.checkbox').checkbox('uncheck');
+                }
+            })
+
+            $('.removeBtn').click(function () {
+                $(this).parents('tr').remove();
+            })
+
+            caculateMoney();
+
+            $('.ui.scrolling.dropdown').dropdown({
+                onChange: function (value, text, $choice) {
+                    $subProduct = $(this).parents('.subProduct');
+
+                    var data = { subProductId: parseInt($subProduct.attr('id')), numberProduct: parseInt(value) };
+                    console.log(data);
+                    $.ajax({
+                        url: "@Url.Action("ChangeNumberProduct","Product")",
+                        type:'POST',
+                        data: JSON.stringify(data),
+                        contentType: 'application/json',
+                        dataType: 'json'
+                    }).done(function () {
+                        console.log('success');
+                        }).fail(function () {
+                            console.log('change product number failed');
+                        });
+                    caculateMoney();
+                }
+            })
+
+            $('.removeBtn').on('click', function () {
+                caculateMoney();
+            })
+
+            $('.ui.scrolling.dropdown').each(function () {
+                var temp = $(this).find('.item.active.selected').data('value');
+                console.log(temp);
+                $(this).dropdown('set selected',temp);
+            });
+
+            $('.ui.checkbox').checkbox({
+                onChange: function () {
+                    caculateMoney();
+                }
+            });
+
+            $('#OrderBtn').on('click', function () {
+
+                @*var orderViewModels = [];
+                var $list = $('.subProduct');
+                for (var i = 0; i < $list.length; i++) {
+                    var subProduct = $($list[i]);
+                    if (subProduct.find('.ui.checkbox').checkbox('is checked')) {
+                        numberProduct = subProduct.find('.ui.scrolling.dropdown').dropdown('get value');
+                        var item = { subProductId: parseInt(subProduct.attr('id')), numberProduct: parseInt(numberProduct) };
+                        orderViewModels.push(item);
+                    }
+                }
+
+                orderViewModels = JSON.stringify(orderViewModels);
+                console.log(orderViewModels);
+
+                $.ajax({
+                    url: "@Url.Action("Order","Order")",
+                    data: orderViewModels,
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    type: 'POST'
+                }).done(function (data) {
+                    switch (data)
+                    {
+                        case 'Success':
+                            window.location.href = '@Url.Action("ShopCart", "Customer")';
+                            break;
+                        case 'RequestLogin':
+                            window.location.href = '@Url.Action("LoginCustomer", "Customer")';
+                            break;
+                        case 'Failed':
+                            window.location.href = '@Url.Action("ShopCart", "Product")';
+                            $('h .error.center.custom').text('Order failed');
+                             break;
+                        case 'Empty':
+                            $('.error.center.custom').text('Giỏ hàng trống!');
+                            break;
+                        default:
+                            break;
+                    }
+
+                    }).fail(function(){
+                        console.log('failed');
+                });*@
+            })
+        })
+    </script>
+}

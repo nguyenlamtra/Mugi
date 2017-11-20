@@ -1,0 +1,394 @@
+﻿@using Mugi.Web.Model.ViewModel
+@using Mugi.Web.Model
+@using Mugi.Web.StaticValue
+@model ProductDetailsViewModel
+@{
+    ViewBag.Title = "DetailProduct";
+    Layout = "~/Views/Shared/_HomePageLayout.cshtml";
+}
+@{
+    var images = @Model.ProductModel.ImageProducts;
+}
+<style>
+    /*set a border on the images to prevent shifting*/
+    #gallery_01 img {
+        border: 2px solid white;
+    }
+    /*Change the colour*/
+
+    .active img {
+        border: 2px solid #333 !important;
+    }
+
+    .ui.tiny.image.custom {
+        width: 60px;
+    }
+
+    .ui.medium.image.custom {
+        width: 350px;
+    }
+
+    .container.custom {
+        text-align: center;
+    }
+</style>
+
+<div class="sixteen wide column">
+    <div class="ui grid stackable">
+
+        <div class="eight wide column">
+            <div class="ui grid stackable">
+                <div class="three wide column">
+
+                    <div class="container">
+                        @*~/images/image1.png*@
+                        <div id="gallery_01" style="text-align:center">
+                            @for (int i = 1; i <= images.Count(); i++)
+                            {
+                                var image = images[i-1];
+                                string active = "";
+                                if (i == 1) { active = "active"; }
+                                <a class="@active ui tiny image custom" href="#" data-image="@image.Url" data-zoom-image="@image.Url">
+                                    <img id="zoom_0@i" src="@image.Url" />
+                                </a>
+                            }
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="thirteen wide column">
+                    <div class="container custom">
+                        <div class="ui medium image custom">
+                            <img style="margin:auto" class="zoomContainer" src="@images.FirstOrDefault().Url" data-zoom-image="@images.FirstOrDefault().Url" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="eight wide column">
+            <div class="content" id="productId" data-value="@Model.ProductModel.Id">
+                <div class="ui list">
+
+                    <div class="item">
+                        <h2 class="ui header" style="text-align:center">@Model.ProductModel.ProductName</h2>
+                    </div>
+
+                    <h5 class="ui horizontal header divider" style="margin:0px">
+                        <div class="item " style="text-align:center">
+                            <div class="ui mini statistic">
+                                <div class="value">
+                                    @Model.ProductModel.PriceDetails.Price
+                                </div>
+                                <div class="label">
+                                    VND
+                                </div>
+                            </div>
+
+                        </div>
+                    </h5>
+
+                    <br />
+
+                    <div class="container">
+
+
+
+
+                        @foreach (PropertyModel property in Model.PropertyModels)
+                        {
+                            <div class="item">
+                                <b>@property.PropertyName : </b>
+
+                                <div class="ui dropdown propertyDetails" id="property-@property.Id">
+                                    <div class="text">chọn @property.PropertyName.ToLower()</div>
+                                    <i class="dropdown icon"></i>
+                                    <div class="menu">
+                                        @foreach (var propertyDetail in property.PropertyDetailsOfSubProducts.Distinct())
+                                        {
+                                            <div class="item" data-value="@propertyDetail.Id">
+                                                @propertyDetail.PropertyValue
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="item">
+                            <b>Nhà sản xuất: </b>  @Model.ProductModel.Supplier.SupplierName
+                        </div>
+                        <div class="item">
+                            <b>Loại sản phẩm: </b>@Model.ProductModel.SubCategory.SubCategoryName
+                            @*<b>Số lượng tồn: </b> @Model.ProductModel.ProductLeft<br /><br />*@
+                        </div>
+                        <div class="item">
+                            <div class="description">
+                                <b class="ui header">Mô tả: </b>@Model.ProductModel.Description
+
+                            </div>
+                        </div>
+                        <div class="item" style="text-align:center;color:red">
+                            <b id="error"></b>
+                        </div>
+                    </div>
+
+                    <div class="extra center aligned" style="text-align:center">
+                        <div class="ui black button" id="addCart">Thêm vào giỏ hàng</div>
+                        <div class="ui compact icon black button" id="refreshBtn">
+                            <i class="ui refresh icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="ui basic modal">
+    <div class="ui icon header">
+        <i class="archive icon"></i>
+        Messages
+    </div>
+    <div class="content" style="text-align: center">
+        <p>Mặt hàng đã được thêm vào giỏ hàng!</p>
+    </div>
+    <div class="actions" style="text-align: center">
+        <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Ok
+        </div>
+    </div>
+</div>
+
+@*<div class="ui comments" style="max-width:none">
+        <h4 class="ui horizontal header divider">
+            <a href="#">Comments</a>
+        </h4>
+        <div class="comment">
+            <a class="avatar">
+                <img src="~/images/avatar.png">
+            </a>
+            <div class="content">
+                <a class="author">Matt</a>
+                <div class="metadata">
+                    <span class="date">Today at 5:42PM</span>
+                </div>
+                <div class="text">
+                    How artistic!
+                </div>
+                <div class="actions">
+                    <a class="reply">Reply</a>
+                </div>
+            </div>
+        </div>
+        <div class="comment">
+            <a class="avatar">
+                <img src="~/images/avatar.png">
+            </a>
+            <div class="content">
+                <a class="author">Elliot Fu</a>
+                <div class="metadata">
+                    <span class="date">Yesterday at 12:30AM</span>
+                </div>
+                <div class="text">
+                    <p>This has been very useful for my research. Thanks as well!</p>
+                </div>
+                <div class="actions">
+                    <a class="reply">Reply</a>
+                </div>
+            </div>
+            <div class="comments">
+                <div class="comment">
+                    <a class="avatar">
+                        <img src="~/images/avatar.png">
+                    </a>
+                    <div class="content">
+                        <a class="author">Jenny Hess</a>
+                        <div class="metadata">
+                            <span class="date">Just now</span>
+                        </div>
+                        <div class="text">
+                            Elliot you are always so right :)
+                        </div>
+                        <div class="actions">
+                            <a class="reply">Reply</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comment">
+            <a class="avatar">
+                <img src="~/images/avatar.png">
+            </a>
+            <div class="content">
+                <a class="author">Joe Henderson</a>
+                <div class="metadata">
+                    <span class="date">5 days ago</span>
+                </div>
+                <div class="text">
+                    Dude, this is awesome. Thanks so much
+                </div>
+                <div class="actions">
+                    <a class="reply">Reply</a>
+                </div>
+            </div>
+        </div>
+        <form class="ui reply form">
+            <div class="field">
+                <textarea style="max-width:none"></textarea>
+            </div>
+            <div class="ui blue labeled submit icon button">
+                <i class="icon edit"></i> Add Reply
+            </div>
+        </form>
+
+    </div>*@
+
+
+@section scripts{
+    <script src="~/js/jquery.elevatezoom.js"></script>
+
+    <script>
+     
+    //initiate the plugin and pass the id of the div containing gallery images
+    $(".zoomContainer").elevateZoom({
+        constrainType: "height",
+        constrainSize: 350,
+        zoomType: "lens",
+        containLensZoom: true,
+        gallery: 'gallery_01',
+        cursor: 'pointer',
+        galleryActiveClass: "active"
+    }); //pass the images to Fancybox
+     $(document).ready(function () {
+        $('#gallery_01 .image').click(function () {
+            $(this).transition({
+                animation: 'pulse',
+                interval: 200
+            });
+        })
+
+    $('#addCart').on('click', function () {
+        var propertyValues = [];
+        var t = $('.ui.dropdown.propertyDetails').dropdown('get value');
+        for (var a = 0; a < t.length; a++) {
+            if (t[a] != '') propertyValues.push(parseInt(t));
+
+        }
+        var productId = $('#productId').data('value');
+        var filter = { propertyDetailsIds: propertyValues, ProductId: productId };
+        console.log(filter);
+        console.log(JSON.stringify(filter));
+        $.ajax({
+            url: "@Url.Action("AddCart","Product")",
+            data: JSON.stringify(filter),
+            type: 'POST',
+            contentType: "application/json"
+        }).done(function (data) {
+            switch (data) {
+                case 'success':
+                     $('.ui.basic.modal')
+                    .modal({
+                        closable: false,
+                        onApprove: function () {
+                            window.location.replace("@Url.Action("HomePage","Product")");
+                        }
+                    }).modal('show');
+                    break;
+                case 'failed':
+                    $('#error').text('Vui lòng chọn đầy đủ thuộc tính');
+                    break;
+                case 'duplicate':
+                    $('#error').text('Bạn đã thêm sản phẩm này vào giỏ hàng');
+                    break;
+                default:
+                    break;
+                }
+            }).fail(function () {
+                console.log('failed');
+            })
+        })
+
+        $('#refreshBtn').on('click', function () {
+            location.reload();
+        })
+
+        $('.ui.dropdown.propertyDetails').dropdown({
+            onChange: function (value, text, $choice) {
+                var propertyValues = $('.ui.dropdown.propertyDetails').dropdown('get value');
+                var productId = $('#productId').data('value');
+                //console.log(propertyValues);
+                $.ajax({
+                    url:"@Url.Action("ProductDetailsFilter", "Product")",
+                    data: { propertyDetailsIds: propertyValues, ProductId:productId},
+                    type: 'GET',
+                    contentType: "application/json",
+                    traditional: true
+                }).done(function (propertyModels) {
+                    //console.log(propertyModels);
+                    for (var i=0; i < propertyModels.length;i++)
+                    {
+                        var property = propertyModels[i];
+                        var propertyDetails = [];
+                        propertyDetails = property.propertyDetailsOfSubProducts;
+                        var $dropdown = $('#property-' + property.id);
+                        var currentPropertyDetails = [];
+                        for (var m = 0; m < $dropdown.find('.item').length; m++)
+                        {
+                            var item = $dropdown.find('.item')[m];
+                            currentPropertyDetails.push($(item).data('value'));
+                        }
+                        for (var k = 0; k < currentPropertyDetails.length; k++) {
+                            var y = currentPropertyDetails[k];
+                            var flag = 0;
+                            for (var j = 0; j < propertyDetails.length; j++) {
+
+                            var x = propertyDetails[j];
+
+                                if (x.id == y) {
+                                    flag = 1;
+                                }
+                            }
+                            if (flag == 0) {
+                                $dropdown.find('.menu').empty();
+                                break;
+                            }
+                        }
+                        if (flag == 0)
+                        {
+                            for (var j = 0; j < propertyDetails.length; j++)
+                            {
+                                var x = propertyDetails[j];
+                                var element = '<div class="item" data-value=' + x.id + '>' + x.propertyValue + '</div>';
+                                //console.log(element);
+                                var items = $dropdown.find('.item');
+                                var flag = true;
+                                console.log(items);
+                                var datavalue = items.attr('data-value');
+                                for (var i = 0; i < datavalue; i++) {
+                                    if (datavalue[i]==x.id){
+                                        flag = false;
+                                        break;
+                                    }
+                                }
+                                if(flag)
+                                    $dropdown.find('.menu').append(element);
+                            }
+                        }
+                    }
+                    }).fail(function () {
+                        console.log('failed');
+                    })
+            }
+        });
+    })
+    </script>
+
+}

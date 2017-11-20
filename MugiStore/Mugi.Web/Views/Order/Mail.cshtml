@@ -1,0 +1,111 @@
+﻿@using Mugi.Web.Model.ViewModel
+@model OrderedViewModel
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .ui.search .prompt {
+            border-radius: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div style="text-align:center;">
+
+        <div style="text-align:center;">
+            <h2 class="ui header center custom">Thông tin hóa đơn</h2>
+
+            <div style="text-align:center;">
+                <table style="margin:auto;width:100%">
+                    <thead>
+                        <tr>
+                            <th colspan="2" style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">
+                                Ngày đặt : 
+                            </th>
+                            <th colspan="3" style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">
+                                @Model.CreatedDate
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colspan="2" style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">
+                                Số lượng sản phẩm
+                            </th>
+                            <th colspan="3" style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">
+                                @Model.NumberProduct
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colspan="2" style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">
+                                Hình thức thanh toán
+                            </th>
+                            <th colspan="3" style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">
+                                @if(Model.PaymentType=="PayPal"){
+                                    <p style="margin:0px;">Thanh toán thông qua PayPal</p>
+                                }
+                                else
+                                {
+                                    <p style="margin:0px;">Thanh toán khi giao nhận hàng</p>
+                                }
+                            </th>
+                        </tr>
+                        <tr> 
+                            <th colspan="2" style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">
+                                Tên khách hàng
+                            </th>
+                            <th colspan="3" style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">
+                                @Model.CustomerName
+                            </th>
+                        </tr>
+                        <tr style="background-color: black;color:white">
+                            <th style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">STT</th>
+                            <th style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">Tên mặt hàng</th>
+                            <th style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">Thuộc tính</th>
+                            <th style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">Đơn giá</th>
+                            <th style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">Số lượng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ var j = 1;}
+                        @foreach (var subItem in Model.SubProductOrderedViewModels)
+                        {
+                            var product = Model.ProductOrderedViewModels.Where(x => x.ProductId == subItem.ProductId).SingleOrDefault();
+                            <tr>
+                                <td style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">@j</td>
+                                <td style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">@product.ProductName</td>
+                                <td style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">
+                                    @foreach (var property in subItem.PropertyDetails)
+                                    {
+                                        <p>@property.PropertyName : @property.PropertyValue</p>
+                                    }
+                                </td>
+                                <td style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">@product.Price</td>
+                                <td style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">@subItem.NumberSubProduct</td>
+                            </tr>
+                        }
+                        <tr>
+                            <th colspan="5" style=" border: 1px solid #dddddd;text-align: center; padding: 8px;">
+                                Tổng tiền : @Model.Total
+                            </th>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">
+                                Số điện thoại: @Model.PhoneNumber
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style=" border: 1px solid #dddddd;text-align: left; padding: 8px;">
+                                Địa chỉ: @Model.Address
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

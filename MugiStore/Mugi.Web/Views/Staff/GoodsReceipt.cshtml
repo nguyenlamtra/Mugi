@@ -1,0 +1,197 @@
+﻿@using Microsoft.AspNetCore.Http;
+@model Mugi.Web.Model.ProductForGoodsReceiptModel
+@{
+    ViewData["Title"] = "GoodsReceipt";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+<style>
+    .ui.very.basic.collapsing.celled.table {
+        width: 100%;
+    }
+    .center.custom {
+        text-align: center;
+    }
+</style>
+
+<div class="twelve wide column">
+    <div class="ui grid stackable">
+
+        <div class="sixteen wide column">
+            <h2 class="ui header center aligned">Nhập hàng</h2>
+            <div class="ui form">
+                <div class="field">
+                    <div class="ui search goodsreceipt">
+                        <div class="ui icon input" style=" width:100%">
+                            <input id="SearchInput" class="prompt insert-name" type="text" placeholder="Search...">
+                            <i class="search icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="PartialView" class="container">
+
+                </div>
+
+               
+            </div>
+
+        </div>
+        <div class="sixteen wide column">
+            <div class="field center custom">
+                <div class="ui button" id="AddGoodsReceipt">
+                    Submit
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="ui basic modal">
+    <div class="ui icon header">
+        <i class="archive icon"></i>
+        Messages
+    </div>
+    <div class="content" style="text-align: center">
+        <p id="message"></p>
+    </div>
+    <div class="actions" style="text-align: center">
+        <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Ok
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            
+            $('.ui.search.goodsreceipt')
+                .search({
+                    apiSettings: {
+                        url: '/Staff/GoodsReceiptSearch?name={query}'
+                    },
+                    fields: {
+                        results: 'results',
+                        title: 'productName',
+                        url: 'url'
+                    },
+                    onSelect: function (result, response) {
+                        var productIds = [];
+                        productIds = $('.productId').attr('id');
+                        var id = result.id;
+                        var flag = true;
+                        if (productIds != undefined) {
+                            for (var i = 0; i < productIds.length; i++) {
+                                if (productIds[i] == id) {
+                                    $('#message').text("Sản phẩm đã được thêm");
+                                    $('.ui.modal').modal({
+                                        onApprove: function () {
+                                            $('#SearchInput').val('');
+                                        }
+                                }).modal('show');
+                                    flag = false;
+                                    break;
+                                }
+                            }
+                        }
+                        console.log($('.productId').attr('id'));
+                        if (flag) {
+                               $.ajax({
+                            url:"@Url.Action("GoodsReceiptProduct", "Staff")",
+                            data: { productId: id },
+                            type: 'POST',
+                            success: function (data) {
+                                //console.log(data);
+                                $('#PartialView').append(data);
+                                $('#SearchInput').val('');
+                            },
+                            error: function () { console.log('error'); }
+                        })
+
+                        }
+
+                    }
+                    //minCharacters: 3
+                })
+                ;
+            $('#AddGoodsReceipt').on('click', function () {
+                var listProduct = $('.productId');
+                var products = [];
+                for (var i = 0; i < listProduct.length; i++) {
+                    var product = listProduct[i];
+                    var productId = $(product).attr('id');
+                    var listSubProduct = $(product).find('.subProductId');
+                    var priceOutput = $(product).find('.priceOutput').val();
+                    var priceInput = $(product).find('.priceInput').val();
+                    priceOutput = parseInt(priceOutput);
+                    priceInput = parseInt(priceInput);
+                    productId = parseInt(productId);
+                    if (priceOutput == null || isNaN(priceOutput) || priceOutput == undefined
+                        || priceInput == null || isNaN(priceInput) || priceInput == undefined
+                        || productId == null || isNaN(productId) || productId == undefined)
+                        continue;
+                    var subProducts = [];
+                    for (var j = 0; j < listSubProduct.length; j++) {
+                        var subProduct = listSubProduct[j];
+                        var subProductId = $(subProduct).attr('id');
+                        var quantity = $(subProduct).find('.quantity').val();
+                        subProductId = parseInt(subProductId);
+                        quantity = parseInt(quantity);
+                        if (subProductId == null || isNaN(subProductId) || subProductId == undefined
+                            || quantity == null || isNaN(quantity) || quantity == undefined||quantity==0)
+                            continue;
+                       
+                        subProducts.push({ subProductId: subProductId, quantity: quantity });
+                    }
+                    if (subProducts.length == 0 || subProducts.length == null
+                        || isNaN(subProducts.length) || subProducts.length == undefined) continue;
+                    products.push({
+                        productId: productId,
+                        priceInput: priceInput,
+                        priceOutput: priceOutput,
+                        subProducts: subProducts
+                    });
+                }
+                products = JSON.stringify(products);
+                console.log(products);
+                $.ajax({
+                    url: "@Url.Action("GoodsReceipt","Staff")",
+                    data: products,
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        var flag = false;
+                        switch (data) {
+                            case 'Failed':
+                                $('#message').text('Thêm thất bại');
+                                $('.ui.basic.modal').modal('show');
+                                break;
+                            case 'Success':
+                                $('#message').text('Thêm thành công');
+                                flag = true;
+                                $('.ui.basic.modal').modal({
+                                    closable: false,
+                                    onApprove: function () {
+                                        if (flag)
+                                            location.reload();
+                                    },
+                                    onDeny: function () {
+                                        $(this).modal('hide');
+                                    }
+                                }).modal('show');;
+                                break;
+                            case 'Error':
+                                $('#message').text('Thêm thất bại');
+                                $('.ui.basic.modal').modal('show');
+                                break;
+                        }
+                        
+
+                    },
+                    error: function () {
+                        console.log('error');
+                    }
+                })
+            })
+        })
+    </script>
+}

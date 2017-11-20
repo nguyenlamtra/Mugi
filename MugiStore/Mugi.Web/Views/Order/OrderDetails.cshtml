@@ -1,0 +1,77 @@
+﻿@using Mugi.Web.Model.ViewModel
+@model List<OrderDetailsViewModel>
+
+@{
+    ViewData["Title"] = "ListOrdered";
+    Layout = "~/Views/Shared/_HomePageLayout.cshtml";
+}
+<style>
+    .ui.collapsing.table.custom {
+        width: 100%;
+    }
+
+    .center.custom {
+        text-align: center;
+    }
+</style>
+<div class="sixteen wide column">
+    <h2 class="ui header center custom">Chi tiết đơn đặt hàng</h2>
+    <table class="ui collapsing table custom">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Hình ảnh</th>
+                <th>Tên mặt hàng</th>
+                <th>Đơn giá</th>
+                <th>Số lượng</th>
+                <th>Thuộc tính</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{ var i = 1;}
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@i</td>
+                    <td>@item.ImageUrl</td>
+                    <td>@item.ProductName</td>
+                    <td>@item.Price</td>
+                    <td>@item.ProductOrder</td>
+                    <td>
+                        @foreach (var propertyDetails in item.PropertyDetails)
+                        {
+                            @propertyDetails.Property.PropertyName: propertyDetails.Property.PropertyDetailsOfSubProducts.Select(x => x.PropertyValue).SingleOrDefault();
+                        }
+
+                    </td>
+
+                </tr>
+                i++;
+            }
+        </tbody>
+
+    </table>
+    <div class="ui accordion field">
+        <div class="title">
+            <i class="icon dropdown"></i>
+            Optional Details
+        </div>
+        <div class="content field">
+            <label class="transition hidden">Maiden Name</label>
+            <input placeholder="Maiden Name" type="text" class="transition hidden">
+        </div>
+    </div>
+
+</div>
+@section scripts
+    {
+    <script>
+        $(document).ready(function () {
+            $('.ui.accordion')
+                .accordion('open', 1)
+                ;
+        })
+
+    </script>
+}
+

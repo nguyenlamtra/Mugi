@@ -1,0 +1,260 @@
+﻿@using Mugi.Web.Model.ViewModel
+@model InsertProductViewModel
+@{
+    ViewData["Title"] = "AddProduct";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .ui.medium.image.custom{
+        width: 350px;
+    }
+
+    input{
+        max
+    }
+    
+    .error{
+        color:red;
+    }
+    textarea.non-max-with {
+        max-width:none;
+        width:100%;
+    }
+    .ui.fluid.search.dropdown {
+        max-width: 280px;
+    }
+</style>
+<div class="twelve wide column">
+
+    <form asp-controller="Staff" asp-action="AddProduct" method="post" class="ui form" enctype="multipart/form-data">
+        <div class="ui segment">
+            <div class="ui grid stackable">
+                <div class="sixteen wide column center aligned">
+                    <h2 class="ui header">
+                        Nhập mặt hàng
+                    </h2>
+                </div>
+                <div class="eight wide column">
+                    <div class="ui container">
+                        <div class="field">
+                            <label asp-for="ProductName">
+                                Tên sản phẩm
+                            </label>
+                            <input asp-for="ProductName" class="non-max-with insert-name" placeholder="Tên sản phẩm"/><br />
+                            <span asp-validation-for="ProductName" class="error"></span>
+                        </div>
+
+                        @*<div class="field">
+                            <label asp-for="Price">
+                               Giá
+                            </label>
+                            <input asp-for="Price"  class="non-max-with" />
+                        </div>
+                        <span asp-validation-for="Price" class="error"></span>*@
+
+                        <div class="field">
+                            <label>Loại sản phẩm</label>
+                            <select asp-for="SubCategoryId" asp-items="@(new SelectList(Model.SubCategories,"Id","Name"))" class="ui fluid search dropdown">
+                                <option value="">Loại sản phẩm</option>
+                            </select>
+                            <span asp-validation-for="SubCategoryId" class="error"></span>
+                        </div>
+
+                        <div class="field">
+                            <label>Nhà sản xuất</label>
+                            <select asp-for="SupplierId" asp-items="@(new SelectList(Model.Suppliers,"Id","Name"))" class="ui fluid search dropdown">
+                                <option value="">Nhà sản xuất</option>
+                            </select>
+                            <span asp-validation-for="SupplierId" class="error"></span>
+                        </div>
+
+                        <div class="ui accordion field supplier">
+                            <div class="title">
+                                <i class="icon dropdown"></i>
+                                Thêm nhà sản xuất
+                            </div>
+                            <div class="content field">
+                                <label>Tên nhà sản xuất</label>
+                                <input  placeholder="Tên nhà sản xuất" id="SupplierName" class="insert-name" type="text">
+                                <button class="ui black button" id="AddSupplier" type="button">Add</button><br />
+                                <span class="error" id="ErrorSupplier"></span>
+
+                            </div>
+                        </div>
+                           
+
+                        <div class="field">
+                            <label>Thuộc tính</label>
+                            <select asp-for="PropertyIds" asp-items="@(new SelectList(Model.Properties,"Id","Name"))" multiple="" class="ui fluid search dropdown">
+                                <option value="">Thuộc tính</option>
+                            </select>
+                            <span asp-validation-for="PropertyIds" class="error"></span>
+                        </div>
+
+                        <div class="ui accordion field property">
+                            <div class="title">
+                                <i class="icon dropdown"></i>
+                               Thêm thuộc tính
+                            </div>
+                            <div class="content field">
+                                <label>Tên thuộc tính</label>
+                                <input class="insert-name" placeholder="Tên thuộc tính" id="PropertyName" type="text">
+                                <button class="ui black button" id="AddProperty" type="button">Add</button><br />
+                                <span id="ErrorProperty" class="error"></span>
+                            </div>
+                        </div>
+
+                        
+
+                    </div>
+                </div>
+                <div class="eight wide column center aligned">
+                   
+
+                    <div class="field">
+                        <label asp-for="Image">
+                            
+                            <div class="ui mini button">
+                                brower
+                            </div>
+                        </label>
+                        <label>(Ảnh hình nên vuông)</label>
+                        <input class="transition hidden" asp-for="Image" type="file" onchange="fileCheck(this);" />
+                        <span asp-validation-for="Image" class="error"></span>
+                        
+                    </div>
+                    <div class="field">
+                        <div class="ui medium image custom">
+                            <img id="image" src="~/images/ProductImages/showDetails.png" alt="your image" />
+                        </div>
+                    </div>
+                  
+                </div>
+                <div class="sixteen wide column center aligned">
+                    <div class="field">
+                        <label asp-for="Description">
+                            Mô tả
+                        </label>
+                        <textarea  asp-for="Description" class="non-max-with insert-description"></textarea>
+                        <span asp-validation-for="Description" class="error"></span>
+                    </div>
+                    
+                    <button class="ui black button" type="submit">Submit</button>
+
+                </div>
+            </div>
+        </div>
+    </form>
+   @if (TempData["AddProduct"] != null)
+   {
+    <div class="ui basic modal">
+        <div class="ui icon header">
+            <i class="archive icon"></i>
+            Messages
+        </div>
+        <div class="content" style="text-align: center">
+            <p>Thêm thành công!</p>
+        </div>
+        <div class="actions" style="text-align: center">
+            <div class="ui green ok inverted button">
+                <i class="checkmark icon"></i>
+                Ok
+            </div>
+        </div>
+    </div>
+    <script>
+    $(document).ready(function () {
+        $('.ui.modal').modal('show');
+    })
+    </script>
+   }
+
+
+</div>
+@section scripts{
+    <script>
+
+        $(document).ready(function () {
+
+            $('.ui.dropdown').dropdown();
+            $('.ui.accordion').accordion();
+            $('#AddSupplier').on('click', function () {
+                var supplierName = $("#SupplierName").val();
+                if (supplierName.trim() != '') {
+                    $.ajax({
+                        url: "@Url.Action("AddSupplier","Staff")",
+                        data: { supplierName: supplierName},
+                        type: 'POST',
+                        success: function (data) {
+                            switch (data.status) {
+                                case 'Success':
+                                    location.reload();
+                                    break;
+                                case 'Failed':
+                                    $('#ErrorProperty').text('Thêm thất bại!');
+                                    break;
+                                case 'Length':
+                                    $('#ErrorSupplier').text('Tên nhà sản xuất quá dài!');
+                                    break;
+                            }
+                        },
+                        error: function () {
+                            console.log('Failed');
+                        }
+                    })
+                }
+            })
+
+            $('#AddProperty').on('click', function () {
+                var propertyName = $("#PropertyName").val();
+                if (propertyName.trim() != '') {
+                    $.ajax({
+                        url: "@Url.Action("AddProperty","Staff")",
+                        data: { propertyName: propertyName},
+                        type: 'POST',
+                        success: function (data) {
+                            switch (data.status) {
+                                case 'Success':
+                                    location.reload();
+                                    break;
+                                case 'Failed':
+                                    console.log('Failed');
+                                    break;
+                                case 'Length':
+                                    $('#ErrorProperty').text('Tên thuộc tính quá dài!'); 
+                                case 'Equals':
+                                    $('#ErrorProperty').text('Tên thuộc tính đã tồn tại!'); 
+                                    break;
+                            }
+                        },
+                        error: function () {
+                            console.log('Failed');
+                        }
+                    })
+                }
+            })
+        })
+
+        function fileCheck(input) {
+            var fileExtension = ['jpeg', 'jpg', 'png', 'gif', 'bmp'];
+            if ($.inArray($(input).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                alert("Only '.jpeg','.jpg', '.png', '.gif', '.bmp' formats are allowed.");
+            } else {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        $('#image')
+                            .attr('src', e.target.result)
+                            .width(350)
+                            .height(350);
+                    };
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+
+            }
+        }
+    </script>
+}

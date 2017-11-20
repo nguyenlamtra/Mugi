@@ -1,0 +1,129 @@
+﻿@using Mugi.Web.Extensions
+@using Mugi.Web.Model.ViewModel
+@model StaffProfileViewModel
+
+@{
+    ViewData["Title"] = "StaffProfile";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .center.custom {
+        text-align: center;
+    }
+
+    .actions.center.custom {
+        text-align: center;
+    }
+
+    .header.center.custom {
+        margin-bottom: 1rem;
+    }
+
+    .error {
+        color: red;
+    }
+</style>
+<div class="twelve wide column">
+    <div class="header center custom">
+        <h2>Thông tin nhân viên</h2>
+        @{ var temp = TempData["ChangePassword"] as string;}
+        @if (temp == "success")
+        {
+            <div class="ui basic modal">
+                <div class="ui icon header">
+                    <i class="archive icon"></i>
+                    Đổi mật khẩu thành công
+                </div>
+                <div class="content">
+
+                </div>
+                <div class="actions center custom">
+                    <div class="ui green ok inverted button">
+                        <i class="checkmark icon"></i>
+                        Ok
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class=" content">
+        <div class="ui items">
+            <div class="item">
+               
+                <div class="content" id="PartialView">
+                    <form asp-controller="Staff" asp-action="StaffProfile" method="post" class="ui form" id="UpdateProfileForm">
+                        <input asp-for="Id" type="hidden">
+                        <input asp-for="AccountId" type="hidden"/>
+                        <div class="two fields disabled">
+                            <div class="field">
+                                <label asp-for="Name">Họ và tên</label>
+                                <input asp-for="Name" class="insert-name" placeholder="Họ và tên">
+                                <span asp-validation-for="Name"></span>
+                            </div>
+                            <div class="field">
+                                <label asp-for="Phone">Số điện thoại</label>
+                                <input asp-for="Phone" class="insert-phone" placeholder="Số điện thoại">
+                                <span asp-validation-for="Phone"></span>
+                            </div>
+                            @*<div class="field">
+                                <label asp-for="Gender">Giới tính</label>
+                                <select asp-for="Gender" asp-items="Html.GetEnumSelectList<GenderType>()"></select>
+                                <span asp-validation-for="Gender"></span>
+                            </div>*@
+                        </div>
+                        <div class="two fields disabled">
+                         
+
+                            <div class="field">
+                                <label asp-for="Mail">Địa chỉ email</label>
+                                <input asp-for="Mail" class="insert-mail" placeholder="Địa chỉ email">
+                                <span asp-validation-for="Mail"></span>
+                            </div>
+                        </div>
+                        <div class="two fields disabled">
+                            <div class="field">
+                                <label asp-for="Address">Địa chỉ</label>
+                                <textarea asp-for="Address" class="insert-description" placeholder="Địa chỉ" rows="2"></textarea>
+                                <span asp-validation-for="Address"></span>
+                            </div>
+
+                        </div>
+                        <div class="field">
+                            <a id="ChangePassword" href="@Url.Action("ChangePassword","Staff")">Đổi mật khẩu</a>
+                        </div>
+                        <div class="field">
+                            <button class="ui button submitBtn" data-value="0" type="button">Sửa</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('.submitBtn').on('click', function () {
+                var value = $(this).data('value');
+                if (value == 0) {
+                    $(this).data('value', 1);
+                    $(this).text('Lưu');
+                    $('.disabled').removeClass('disabled');
+                }
+                else {
+                    $('#UpdateProfileForm').submit();
+                }
+            })
+            $('.ui.basic.modal')
+                .modal('show')
+                .modal({ closable: false});
+        });
+
+    </script>
+}

@@ -1,0 +1,44 @@
+﻿@import url(//fonts.googleapis.com/css?family=Comfortaa);
+
+body {
+    background: #f4f4f4;
+    padding-bottom: 20px;
+    font-family: 'Comfortaa', cursive;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* Header */
+.sitename{
+    font-weight:bold;
+    font-size:16px;
+}
+.ui.menu#header{
+    border-radius:0;
+}
+/* Font */
+.f12 {
+    font-size: 12px;
+}
+.f14 {
+    font-size: 14px;
+}
+.f16 {
+    font-size: 16px;
+}
+
+.f-bold{
+    font-weight:bold;
+}
+

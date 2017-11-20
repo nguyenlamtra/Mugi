@@ -1,0 +1,270 @@
+﻿@using Mugi.Web.Model.ViewModel
+@model AddSubCategoryViewModel
+
+@{
+    ViewData["Title"] = "AddCategory";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+<style>
+    textarea, input{
+        max-width:none;
+    }
+
+    .error {
+        color: red;
+    }
+
+    .ui.container.scroll {
+        overflow-y: scroll;
+        max-height: 70vh;
+    }
+</style>
+
+<div class="twelve wide column">
+
+    <form asp-controller="Staff" asp-action="AddSubCategory" method="post" class="ui form">
+        <input type="hidden" id="Id" />
+        <div class="ui segment">
+            <div class="ui grid stackable">
+                <div class="sixteen wide column center aligned">
+                    <h2 class="header">
+                        Nhập nhóm mặt hàng
+                    </h2>
+                </div>
+                <div class="eight wide column center aligned">
+                    <div class="ui container">
+                        <input type="hidden" id="Id" name="Id" />
+                        <div class="field">
+                            <label for="SubCategoryName">Tên loại sản phẩm con</label>
+                            <input name="SubCategoryName" id="SubCategoryName" class="insert-name" />
+                        </div>
+
+                        <div class="field">
+                            <label for="CategoryId">Tên loại sản phẩm</label>
+                            <select id="CategoryId" class="ui search dropdown">
+                                <option value="">Tên loại sản phẩm</option>
+                                @foreach (var i in Model.Categories)
+                                {
+                                    <option value="@i.Id">@i.Name</option>
+                                }
+                                
+                            </select>
+                        </div>
+
+
+                        <div class="field">
+                            <label for="SubCategoryDescription">Mô tả</label>
+                            <textarea id="SubCategoryDescription" name="SubCategoryDescription" class="insert-description"></textarea>
+                        </div>
+                        <span id="errors" class="error"></span>
+
+                        <button class="ui black button" id="AddSubCategoryBtn" type="button">Thêm</button>
+                        <button class="ui black button transition hidden" id="UpdateSubCategoryBtn" type="button">Sửa</button>
+                        <button class="ui black button transition hidden" id="CancelBtn" type="button">Hủy</button>
+                        <button class="ui black button transition hidden" id="DeleteSubCategoryBtn" type="button">Xóa</button>
+                    </div>
+                </div>
+                <input id="Category-Id" name="Category-Id" type="hidden" value="@Model.CategoryId" />
+                <div class="eight wide column">
+                    <div class="ui container scroll">
+                        <table class="ui basic table center aligned">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Tên nhóm mặt hàng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var i in Model.SubCategories)
+                                {
+                                    <tr class="row">
+                                        <td class="subcategory-id" data-id="@i.Id">@i.Id</td>
+                                        <td class="subcategory-name" data-name="@i.SubCategoryName">@i.SubCategoryName</td>
+                                        <td class="transition hidden subcategory-description" data-description="@i.SubCategoryDescription">@i.SubCategoryDescription</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="sixteen wide column center aligned">
+                    <div class="field">
+                        <span id="exist" class="error"></span>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="ui basic modal">
+        <div class="ui icon header">
+            <i class="archive icon"></i>
+            Messages
+        </div>
+        <div class="content" style="text-align: center">
+            <p id="message"></p>
+        </div>
+        <div class="actions" style="text-align: center">
+            <div class="ui green ok inverted button">
+                <i class="checkmark icon"></i>
+                Ok
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+@section scripts{
+    <script>
+         function insertOrUpdateSubCategory() {
+                var subCategoryName = $('#SubCategoryName').val();
+                var subCategoryDescription = $('#SubCategoryDescription').val();
+                var categoryId = $('.ui.search.dropdown').dropdown('get value');
+                var id = $('#Id').val() == "" ? 0 : parseInt($('#Id').val());
+                var viewModel = JSON.stringify({
+                    id: id, subCategoryName: subCategoryName,
+                    subCategoryDescription: subCategoryDescription,
+                    categoryId: categoryId
+                });
+
+                console.log(viewModel);
+
+                $.ajax({
+                    url: "@Url.Action("AddOrUpdateSubCategory", "Staff")" ,
+                    data: viewModel,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function (data) {
+                        switch (data.status) {
+                            case 'InsertSuccess':
+                                $('#message').text('Thêm loại sản phẩm con thành công');
+                                $('.ui.modal').modal({
+                                    onApprove: function () {
+                                        location.reload();
+                                    }
+                                }).modal('show');
+                                break;
+                            case 'UpdateSuccess':
+                                $('#message').text('Cập nhật loại sản phẩm con thành công');
+                                $('.ui.modal').modal({
+                                    onApprove: function () {
+                                        location.reload();
+                                    }
+                                }).modal('show');
+                                break;
+                            case 'InsertFailed':
+                                $('#message').text('Thêm loại sản phẩm con thất bại, tên sản phẩm trùng hoặc vì lí do khác!');
+                                $('.ui.modal').modal('show');
+                                break;
+                            case 'UpdateFailed':
+                                $('#message').text('Cập nhật loại sản phẩm con thất bại, tên sản phẩm trùng hoặc vì lí do khác!');
+                                $('.ui.modal').modal('show');
+                                break;
+                            case 'Error':
+                                for (var i = 0; i < data.errors.length; i++) {
+                                    for (var j = 0; j < data.errors[i].length; j++) {
+                                        $('#errors').append('<p>' + data.errors[i][j].errorMessage + '</p>');
+                                    }
+                                }
+                                break;
+                        }
+                    },
+                    error: function () {
+                        console.log('error');
+                    }
+                })
+        }
+
+        function deleteSubCategory() {
+            $('.row').each(function () {
+                if ($(this).hasClass('active')) {
+                    var currentRow = $(this);
+                    var id = $(this).find('.subcategory-id').data('id');
+                    console.log('subcategory delete: ' + id);
+                    $('#message').text('Xác nhận xóa loại sản phẩm con');
+                    $('.ui.modal').modal({
+                        onApprove: function () {
+                            $.ajax({
+                                url: "@Url.Action("DeleteSubCategory","Staff")",
+                                data: { "SubCategoryId": id },
+                                type: 'POST',
+                                success: function (data) {
+                                    if (data == true) {
+                                        $('#message').text('Xóa thành công');
+                                        $('.ui.modal').modal('show').modal({ onApprove: function () { $('.ui.modal').modal('hide') } });
+                                        currentRow.remove();
+                                        setButtonDefault();
+                                    } else {
+                                        $('#message').text('Xóa thất bại');
+                                        $('.ui.modal').modal('show').modal({
+                                            onApprove: function () {
+                                                $('.ui.modal').modal('hide')
+                                            }
+                                        });
+                                    }
+                                },
+                                error: function () {
+                                    console.log('delete subcategory error');
+                                }
+                            })
+                        }
+                    }).modal('show');
+                }
+            })
+        }
+        function setButtonDefault() {
+            $('#UpdateSubCategoryBtn').transition('hide');
+            $('#CancelBtn').transition('hide');
+            $('#DeleteSubCategoryBtn').transition('hide');
+            $('#AddSubCategoryBtn').transition('show');
+
+
+            $("#Id").val('');
+            $("#SubCategoryName").val('');
+            $("#SubCategoryDescription").val('');
+            $("#CategoryId").dropdown('restore defaults');
+
+        }
+
+        $(document).ready(function () {
+            //$('.ui.modal').modal('show');
+            $('#UpdateSubCategoryBtn').on('click', function () {
+                insertOrUpdateSubCategory();
+            })
+            $('#AddSubCategoryBtn').on('click', function () {
+                insertOrUpdateSubCategory();
+            })
+            $('#DeleteSubCategoryBtn').on('click', function () {
+                deleteSubCategory();
+            })
+            $('.ui.dropdown').dropdown();
+            $('#CancelBtn').on('click', function () {
+                setButtonDefault();
+
+                $(".row").removeClass('active');
+            })
+            $('.row').on('click', function () {
+                $(this).addClass('active');
+                $(this).siblings().removeClass('active');
+                var subCategoryId = $(this).find('.subcategory-id').data('id');
+                var subCategoryName = $(this).find('.subcategory-name').data('name');
+                var categoryId = $('#Category-Id').val();
+                var subCategoryDescription = $(this).find('.subcategory-description').data('description');
+                $("#Id").val(subCategoryId);
+                $("#SubCategoryName").val(subCategoryName);
+                $("#SubCategoryDescription").val(subCategoryDescription);
+                $("#CategoryId").dropdown('set value', categoryId);
+                $('#UpdateSubCategoryBtn').transition('show');
+                $('#CancelBtn').transition('show');
+                $('#DeleteSubCategoryBtn').transition('show');
+                $('#AddSubCategoryBtn').transition('hide');
+            })
+        })
+    </script>
+
+}

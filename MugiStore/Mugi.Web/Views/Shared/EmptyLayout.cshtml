@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/semantic_ui/semantic.css" />
+    <link rel="stylesheet" href="~/css/semantic-custom.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/jquery.bxslider.css" />
+    <link rel="stylesheet" href="~/css/calendar.min.css" />
+    <style>
+        .ui.search .prompt {
+            border-radius: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+                @RenderBody()
+<script>
+    $(document).ready(function () { 
+        $('.insert-name').attr('maxlength', '30');
+        $('.insert-description').attr('maxlength', '1000');
+        $('.insert-price').attr('maxlength', '10');
+        $('.insert-price').keypress(function (event) {
+            return event.charCode >= 48 && event.charCode <= 57
+        })
+    })
+
+</script>
+</body>
+
+</html>

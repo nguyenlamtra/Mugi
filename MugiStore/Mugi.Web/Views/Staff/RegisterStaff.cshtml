@@ -1,0 +1,80 @@
+﻿@using Mugi.Web.Model.ViewModel
+
+@model RegisterStaffViewModel
+
+@{
+    ViewData["Title"] = "RegisterStaff";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+
+<style>
+    .error {
+        color: red;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $('.ui.dropdown').dropdown(
+            'set value',1
+        );
+    })
+
+</script>
+<div class="one wide column"></div>
+<div class="eight wide column">
+    <form class="ui form" asp-controller="Staff" asp-action="RegisterStaff" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input asp-for="Id" value="0" type="hidden" />
+        <h3 class=" ui dividing header">Đăng ký thành viên</h3>
+        <div class="field">
+            <label asp-for="Name">Họ và tên</label>
+            <div class="field">
+                <input asp-for="Name" class="insert-name">
+            </div>
+            <span asp-validation-for="Name" class="error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Mail">Email</label>
+            <div class="field">
+                <input asp-for="Mail" class="insert-mail">
+            </div>
+            <span asp-validation-for="Mail" class="error"></span>
+        </div>
+
+        @*<div class="field">
+            <label asp-for="Gender">Giới tính</label>
+            <div class="field">
+                <select asp-for="Gender" asp-items="Html.GetEnumSelectList<GenderType>()"></select>
+            </div>
+            <span asp-validation-for="Gender" class="error"></span>
+        </div>*@
+
+        <div class="field">
+            <label asp-for="Account.UserName">Tên tài khoản</label>
+            <div class="field">
+                <input asp-for="Account.UserName" class="insert-name">
+            </div>
+            <span asp-validation-for="Account.UserName" class="error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Account.Password">Mật khẩu</label>
+            <div class="field">
+                <input asp-for="Account.Password" type="password" class="insert-name">
+            </div>
+            <span asp-validation-for="Account.Password" class="error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="RePassword">Nhập lại mật khẩu</label>
+            <div class="field">
+                <input asp-for="RePassword" type="password" class="insert-name">
+            </div>
+            <span asp-validation-for="RePassword" class="error"></span>
+        </div>
+
+        <button class="ui button" type="submit">Đăng ký</button>
+
+    </form>
+
+</div>
+<div class="seven wide column"></div>

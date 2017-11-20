@@ -1,0 +1,10 @@
+@using Mugi.Web.Model
+@model List<AdvertisementModel>
+
+@*Slider*@
+<ul class="bxslider">
+    @foreach (AdvertisementModel item in Model)
+    {
+        <li><img src="@item.Url" /></li>
+    }
+</ul>

@@ -1,0 +1,275 @@
+﻿@using Mugi.Web.Model.ViewModel
+@using Mugi.Web.Model
+@using Microsoft.AspNetCore.Http;
+@model HomePageViewModel
+@{
+    ViewBag.Title = "HomePage";
+    ViewBag.CartNumber = Context.Session.GetInt32("count");
+    Layout = "~/Views/Shared/_HomePageLayout.cshtml";
+}
+
+
+<style>
+    .ui.grid.one.column.footer {
+        text-align: center;
+    }
+    .ui.search .prompt {
+        border-radius: 0.3rem;
+    }
+    .content{
+        min-height:0px;
+    }
+</style>
+@**Verticle Menu Shop*@
+
+<div class="four wide column">
+   
+    <div class="item">
+        <div class="ui search layout">
+            <div class="ui icon input" style=" width:100%">
+                <input class="prompt" type="text" placeholder="Search...">
+                <i class="search icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui vertical accordion menu" style="width:100%">
+        @{
+            @foreach (CategoryModel item in Model.CategoryModels)
+            {
+                <div class="item">
+                    <div class=" title">
+                        <i class="dropdown icon"></i>
+                        @item.CategoryName
+                    </div>
+                    <div class="content ">
+                        @foreach (SubCategoryModel subItem in item.SubCategoryModels)
+                        {
+                            <a class="item subCategory" id="@subItem.Id"> @subItem.SubCategoryName</a>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+
+
+@*Main Home Page*@
+
+<div class="twelve wide column">
+
+    @*Popup Producer Filter*@
+    <div>
+        <div class="ui fluid popup bottom left transition hidden">
+            <div class="ui four column relaxed equal height divided grid">
+
+                @foreach (SupplierModel item in Model.SupplierModels)
+                {
+                    <div class="column container ">
+
+                        <div class="ui checkbox supplier">
+                            <input type="checkbox" tabindex="0" class="hidden" value="@item.Id">
+                            <label>@item.SupplierName</label>
+                        </div>
+
+                    </div>
+                }
+
+
+            </div>
+            <div class="ui items">
+                <div class="item">
+                    <div class="ui button" style="margin:auto" id="supplierIds">Search</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        @*Main Home Page*@
+
+        <div class="twelve wide column">
+            <div class="ui small stackable menu">
+
+                <a class="producer item">
+                    Thương hiệu
+                    <i class="dropdown icon"></i>
+                </a>
+
+                <div class="ui dropdown item" id="priceFilter">
+                    Mức giá
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <div class="item prices" data-value="1">
+                            <span class="text">Tất cả mức giá</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="item prices" data-value="2">
+                            <span class="text">Dưới 200,000 VNĐ</span>
+                        </div>
+                        <div class="item prices" data-value="3">
+                            <span class="text">
+                                Từ 200,000 VNĐ - 400,000 VNĐ
+                            </span>
+                        </div>
+                        <div class="item prices" data-value="4">
+                            <span class="text">
+                                Trên 400,000 VNĐ
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+                @*Static Filter*@
+
+                <div class="ui dropdown item" id="staticFilter">
+                    Lọc theo &ensp;
+                    <i class="ui dropdown icon"></i>
+                    <div class="menu">
+                        <div class="item staticFilter" data-value="1">
+                            <span class="text">Giá (tăng dần)</span>
+                        </div>
+                        <div class="item staticFilter" data-value="2">
+                            <span class="text">Giá (giảm dần)</span>
+                        </div>
+                        <div class="item staticFilter" data-value="3">
+                            <span class="text">Thời gian (mới nhất)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="partialview">
+                @{Html.RenderPartial("_Product", Model.ProductModels);}
+            </div>
+        </div>
+    </div>
+
+</div>
+@section scripts {
+
+    <script>
+
+    function ajaxFilter(pageNumber) {
+
+        var subCategoryId = '';
+        var supplierIds = [];
+        var priceFilterId = '';//1: all; 2: <200; 3: 200-400; 4: >400;
+        var staticFilterId = '';//1: increase; 2: reduce; 3: time
+
+        $('.item.subCategory').each(function () {
+            if ($(this).hasClass('active')) subCategoryId = $(this).attr('id');
+        });
+
+        $('.ui.checkbox.supplier').each(function () {
+            if ($(this).hasClass('checked'))
+                supplierIds.push($(this).find('input').val());
+        })
+
+        priceFilterId = $('#priceFilter').dropdown('get value');
+
+        staticFilterId = $('#staticFilter').dropdown('get value');
+
+        var val1, val2 = new Array() , val3, val4;
+
+        if (subCategoryId === '') val1 = 0;
+        else val1 = parseInt(subCategoryId);
+        if (supplierIds.length === 0) val2.push(0);
+        else {
+            for (var i = 0; i < supplierIds.length; i++) {
+                val2.push(parseInt(supplierIds[i]));
+            }
+        }
+        if (priceFilterId === '') val3 = 0;
+        else val3 = parseInt(priceFilterId);
+        if (staticFilterId === '') val4 = 0;
+        else val4 = parseInt(staticFilterId);
+        var data = {
+            subCategoryId: val1, supplierIds: val2,
+            priceFilterId: val3, staticFilterId: val4
+        };
+        console.log(data);
+        $.ajax({
+            url: "@Url.Action("Filter", "Product")",
+            data: data,
+            type: 'GET',
+            dataType: "html",
+            contentType: "application/json",
+            traditional: true
+        }).done(function (partialView) {
+            $('#partialview').empty();
+            $('#partialview').html(partialView);
+            }).fail(function () {
+                console.log('false');
+
+            })
+
+    }
+
+        $(document).ready(function () {
+
+        $('.ui.search.layout')
+            .search({
+                apiSettings: {
+                    url: '/Product/SearchProduct?name={query}'
+                },
+                fields: {
+                    results: 'results',
+                    title: 'productName',
+                    url: 'url'
+                }
+                //minCharacters: 3
+            })
+            ;
+
+        $('#supplierIds').on('click', function () {
+            console.log('supplier filter');
+            ajaxFilter();
+        })
+
+        $('.item.subCategory').on('click', function () {
+            $('.item.subCategory').removeClass('active');
+            $(this).addClass('active');
+            console.log('subcategory filter');
+            ajaxFilter();
+        })
+
+        $('.ui.dropdown.item').dropdown({
+            on: 'hover',
+            onChange: function (value, text, $choice) {
+                console.log('static filter');
+                $choice.siblings().find('i').remove();
+                $choice.find('i').remove();
+                $choice.children().before('<i class="checkmark icon"></i>');
+                ajaxFilter();
+            }
+        });
+
+        $('.ui.rating')
+            .rating('disable');
+
+        $('.ui.checkbox').checkbox();
+
+        $('.producer')
+            .popup({
+                popup: $('.popup'),
+                inline: true,
+                hoverable: true,
+                position: 'bottom left',
+                delay: {
+                    show: 100,
+                    hide: 300
+                }
+            });
+
+        $('.ui.accordion')
+            .accordion();
+    })
+
+    </script>
+}

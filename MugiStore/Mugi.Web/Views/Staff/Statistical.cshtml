@@ -1,0 +1,89 @@
+﻿@model Mugi.Web.Model.ViewModel.StatisticalViewModel
+@{
+    ViewData["Title"] = "Statistical";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+<div class="twelve wide column">
+    <div class="ui grid stackable">
+        <div class="sixteen wide column">
+            <header style="text-align:center;">
+                <h2>Thống kê doanh thu</h2>
+            </header>
+        </div>
+        <div class="sixteen wide column" style="text-align:center;">
+            <form asp-action="Statistical" asp-controller="Staff" method="post">
+                    <div class="ui form">
+                        <div class="two fields">
+                            <div class="field">
+                                <div class="ui calendar" id="rangestart">
+                                    <div class="ui input left icon">
+                                        <i class="calendar icon"></i>
+                                        <input type="text" asp-for="StatisticalModel.StartDate" placeholder="Ngày bắt đầu">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="ui calendar" id="rangeend">
+                                    <div class="ui input left icon">
+                                        <i class="calendar icon"></i>
+                                        <input type="text" asp-for="StatisticalModel.EndDate" placeholder="Ngày kết thúc">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                      
+                        <div class="field">
+                            <button type="submit" class="ui button">Submit</button>
+                        </div>
+                    </div>
+            </form>
+        </div>
+        <div class="sixteen wide column" style="text-align:center;">
+            <table class="ui very basic collapsing celled table">
+                <thead>
+                    <tr>
+                        <th>Ngày thanh toán hóa đơn</th>
+                        <th>Tổng tiền thanh toán</th>
+                       
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null)
+                    {
+                        foreach (var order in Model.StatisticalTableModel.Orders)
+                        {
+                            <tr>
+                                <td>@order.ConfirmDate</td>
+                                <td>@order.Total</td>
+                                
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            
+            $('#rangestart').calendar({
+                type: 'date',
+                endCalendar: $('#rangeend')
+            });
+            $('#rangeend').calendar({
+                type: 'date',
+                startCalendar: $('#rangestart')
+            });
+            //$('#rangestart').calendar('clear')
+            //$('#rangeend').calendar('clear')
+
+        })
+
+    </script>
+}
+
+
+

@@ -1,0 +1,185 @@
+﻿@using Mugi.Web.Model.ViewModel
+@model List<ListProductViewModel>
+@{
+    ViewData["Title"] = "ListProduct";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+<style>
+    .ui.collapsing.table.custom {
+        width: 100%;
+    }
+    .ui.container.custom {
+        overflow-y: scroll;
+        height: 75vh;
+    }
+</style>
+@{
+    var status = TempData["ListProduct"] as string;
+    switch (status)
+    {
+        case "Success":
+            <div class="ui basic modal notification">
+                <div class="ui icon header">
+                    <i class="archive icon"></i>
+                    Messages
+                </div>
+                <div class="content" style="text-align: center">
+                    <p>Xóa thành công!</p>
+                </div>
+                <div class="actions" style="text-align: center">
+                    <div class="ui green ok inverted button">
+                        <i class="checkmark icon"></i>
+                        Ok
+                    </div>
+                </div>
+            </div>
+            break;
+        case "Failed":
+            <div class="ui basic modal notification">
+                <div class="ui icon header">
+                    <i class="archive icon"></i>
+                    Messages
+                </div>
+                <div class="content" style="text-align: center">
+                    <p>Xóa thất bại!</p>
+                </div>
+                <div class="actions" style="text-align: center">
+                    <div class="ui green ok inverted button">
+                        <i class="checkmark icon"></i>
+                        Ok
+                    </div>
+                </div>
+            </div>
+            break;
+    }
+}
+<div class="ui basic modal confirm">
+    <div class="ui icon header">
+        <i class="archive icon"></i>
+        Messages
+    </div>
+    <div class="content" style="text-align: center">
+        <p>Xác nhận xóa</p>
+    </div>
+    <div class="actions" style="text-align: center">
+        <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Ok
+        </div>
+        <div class="ui red basic cancel inverted button">
+            <i class="remove icon"></i>
+            Cancel
+        </div>
+    </div>
+</div>
+<div class="twelve wide column">
+    <div class="ui small stackable menu">
+        <a class="item" id="AddSubProduct">
+            Thêm sản phẩm con
+        </a>
+        <a class="item" id="Delete">
+            Xóa sản phẩm
+        </a>
+        <a class="item" id="Update">
+            Sửa thông tin
+        </a>
+        <a class="item" id="AddImage">
+            Thêm ảnh
+        </a>
+        <a class="item" href="@Url.Action("AddProduct","Staff")">
+
+            Nhập sản phẩm
+        </a>
+    </div>
+    <form method="get" id="FormSubmit">
+        <input type="hidden" name="ProductId" id="ProductId" />
+    </form>
+    <div class="ui grid stackable">
+        <div class="sixteen wide column center aligned">
+            <h2 class="ui header"> Danh sách sản phẩm</h2>
+        </div>
+        <div class="sixteen wide column center aligned">
+            <div class="ui container custom">
+                <table class="ui very basic collapsing celled table custom">
+                    <thead>
+                        <tr>
+                            <th class="center aligned">IDSP</th>
+                            <th class="center aligned">Tên sản phẩm</th>
+                            <th class="center aligned">Tên NCC</th>
+                            <th class="center aligned">Số lượng tồn</th>
+                            <th class="center aligned">Giá</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="field-product">
+                                <td class="IDSP center aligned" id="@item.Id">@item.Id</td>
+                                <td class="center aligned">@item.ProductName</td>
+                                <td class="center aligned">@item.SupplierName</td>
+                                <td class="center aligned">@item.ProductLeft</td>
+                                <td class="center aligned">@item.Price</td>
+                            </tr>
+
+                        }
+
+
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+   
+
+</div>
+@section scripts{
+    <script>
+        function FindIdAndSubmit(action) {
+            var id = 0;
+            $('.field-product').each(function () {
+                if ($(this).hasClass('active')) {
+                    id = $(this).find('.IDSP').attr('id');
+                }
+            })
+            if (id != 0) {
+                $('#ProductId').val(id);
+                $('#FormSubmit').attr('action', action);
+                $('#FormSubmit').submit();
+            }
+        }
+        $(document).ready(function () {
+
+            $('.ui.modal.notification').modal({ closable: false}).modal('show');
+
+
+            $('.field-product').on('click', function () {
+                $(this).addClass('active');
+                $(this).siblings().removeClass('active');
+            })
+            $('#AddSubProduct').on('click', function () {
+                FindIdAndSubmit('@Url.Action("AddSubProduct","Staff")');
+            })
+            $('#Delete').on('click', function () {
+                if ($('.field-product').length==0 || !$('.field-product').hasClass('active')) return;
+                  $('.ui.modal.confirm').modal({
+                        closable: false,
+                        onApprove: function () {
+                           FindIdAndSubmit('@Url.Action("Delete", "Staff")');
+                        },
+                        onDeny: function () {
+                            $(this).modal('hide');
+                        }
+                 }).modal('show');
+            })
+            $('#Update').on('click', function () {
+                FindIdAndSubmit('@Url.Action("UpdateProduct", "Staff")');
+            })
+            $('#AddImage').on('click', function () {
+                FindIdAndSubmit('@Url.Action("AddImageProduct", "Staff")');
+            })
+        })
+
+    </script>
+}

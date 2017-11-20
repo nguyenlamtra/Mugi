@@ -1,0 +1,139 @@
+﻿@using Mugi.Web.Model.ViewModel
+@model AddSubProductViewModel
+
+@{
+    ViewData["Title"] = "AddSubProduct";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+
+<style>
+    .ui.medium.image.custom {
+        width: 350px;
+    }
+
+    .error {
+        color: red;
+    }
+
+    .non-max-with {
+        max-width: none;
+    }
+    .ui.fluid.search.dropdown {
+        max-width: 280px;
+    }
+</style>
+<div class="twelve wide column">
+
+    <form asp-controller="Staff" asp-action="AddSubProduct" method="post" class="ui form" enctype="multipart/form-data">
+        <input type="hidden" asp-for="ProductId" />
+        <div class="ui segment">
+            <div class="ui grid stackable">
+                <div class="sixteen wide column center aligned">
+                    <h2 class="header">
+                        Nhập chi tiết mặt hàng
+                    </h2>
+                </div>
+                <div class="eight wide column">
+                    <div class="ui container">
+                        @foreach (var item in Model.Properties)
+                        {
+                            <div class="field">
+                                <label>@item.PropertyName</label>
+                                <select asp-items="@(new SelectList(@item.PropertyDetails,"Id","Name"))" class="ui fluid search dropdown propertyId">
+                                    <option value="">@item.PropertyName</option>
+                                </select>
+                            </div>
+                            <span id="propertyDetails-@item.Id" class="error"></span>
+                        }
+                    </div>
+                </div>
+                <div class="eight wide column center aligned">
+                    <div class="field">
+                        <div class="ui medium image custom">
+                            <img id="image" src="@Model.Image" alt="your image" />
+                        </div>
+                    </div>
+
+                </div>
+                <div class="sixteen wide column center aligned">
+                    <div class="field">
+                        <span id="exist" class="error"></span>
+                    </div>
+                    
+                    <button class="ui black button" id="AddSubProductBtn" type="button">Submit</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="ui basic modal">
+        <div class="ui icon header">
+            <i class="archive icon"></i>
+            Messages
+        </div>
+        <div class="content" style="text-align: center">
+            <p>Mặt hàng đã được thêm vào thành công!</p>
+        </div>
+        <div class="actions" style="text-align: center">
+            <div class="ui green ok inverted button">
+                <i class="checkmark icon"></i>
+                Ok
+            </div>
+        </div>
+    </div>
+
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('.ui.dropdown').dropdown();
+            $('#AddSubProductBtn').on('click', function () {
+                var array = $('.propertyId').dropdown('get value');
+                var result = [];
+                var productId = parseInt($('#ProductId').val());
+                //for (var i = 0; i < array.length; i++) {
+                //    if (array[i] != '') {
+                //        result.push(parseInt(array[i]));
+                //    }
+                //}
+                //result = JSON.stringify({ ProductId: productId, PropertyDetailIds: result });
+
+                result.push(parseInt(array));//
+                result = JSON.stringify({ ProductId: productId, PropertyDetailIds: result });//
+                console.log('list id: ' + result);
+                $.ajax({
+                    url: "@Url.Action("AddSubProduct","Staff")",
+                    data: result ,
+                    contentType: 'application/json; charset=utf-8',
+
+                    type: 'POST',
+                    traditional:true
+                }).done(function (data) {
+                    $('.error').text('');
+                    switch (data.status) {
+                        case 'fails':
+                            for (var i = 0; i < data.errors.length; i++) {
+                                var error = data.errors[i];
+                                $('#propertyDetails-' + error.id).text(error.message);
+                                console.log($('#propertyDetails-' + error.id));
+                            }
+                            break;
+                        case 'success':
+                            $('.ui.basic.modal').modal('show');
+                            
+                             break;
+                        case 'exist':
+                            $('#exist').text(data.error);
+                            break;
+                        case 'insertFailed':
+                            $('#exist').text(data.error);
+                            break;
+                    }
+                    }).fail(function () {
+                        console.log('fails');
+                    })
+            })
+        })
+    </script>
+}

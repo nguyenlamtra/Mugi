@@ -1,0 +1,35 @@
+﻿body {
+    background: #fff;
+}
+
+#content {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    min-width: 0px;
+}
+
+    #content .ui.masthead.vertical.segment {
+        padding: 3em 0em;
+    }
+    #content .ui.pointing.menu .item.active{
+        font-weight:bold;
+    }
+
+.pusher {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+}
+
+#sidebar .ui.menu {
+    font-size: 12px;
+}
+
+
+

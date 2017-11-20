@@ -1,0 +1,76 @@
+﻿@using Microsoft.AspNetCore.Http;
+@using Mugi.Web.Extensions
+@using Mugi.Web.Model
+@{
+    List<AdvertisementModel> advertisementModel = new List<AdvertisementModel>();
+    advertisementModel = ViewBag.AdvertisementModels;
+}
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Mugiwara</title>
+    <link rel="stylesheet" href="~/css/semantic_ui/semantic.css" />
+    <link rel="stylesheet" href="~/css/semantic-custom.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/jquery.bxslider.css" />
+
+    <link rel="stylesheet" href="~/css/calendar.min.css" />
+    <script src="~/js/jquery-3.2.1.js"></script>
+    <script src="~/js/semantic.js"></script>
+    <style>
+        .ui.search .prompt {
+            border-radius: 0.3rem;
+        }
+    </style>
+
+</head>
+
+<body>
+    @RenderBody()
+
+
+
+    <script src="~/js/jquery-3.2.1.js"></script>
+    <script src="~/js/semantic.js"></script>
+    <script src="~/js/jquery.bxslider.js"></script>
+    <script src="~/js/dropzone.js"></script>
+    <script type="text/javascript" src="~/js/calendar.min.js"></script>
+
+    <script>
+        $('.bxslider').bxSlider({
+            auto: true,
+            autoControls: true
+        });
+        $(document).ready(function () {
+            $('.ui.search.layout')
+                .search({
+                    apiSettings: {
+                        url: '/Staff/SearchProduct?name={query}'
+                    },
+                    fields: {
+                        results: 'results',
+                        title: 'productName',
+                        url: 'url'
+                    }
+                    //minCharacters: 3
+                })
+                ;
+            $('.insert-name').attr('maxlength', '30');
+            $('.insert-description').attr('maxlength', '1000');
+            $('.insert-price').attr('maxlength', '10');
+            $('.insert-price').keypress(function (event) {
+                return event.charCode >= 48 && event.charCode <= 57
+            })
+        })
+    </script>
+
+
+
+    @RenderSection("scripts", required: false)
+
+</body>
+</html>

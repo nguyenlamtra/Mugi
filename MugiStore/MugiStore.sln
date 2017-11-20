@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mugi.Domain", "Mugi.Domain\Mugi.Domain.csproj", "{43382C05-3B71-4976-9348-80B059C4BC9D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mugi.Core", "Mugi.Core\Mugi.Core.csproj", "{995008AF-8178-4CC3-8CE0-853E2B4F0504}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mugi.Service", "Mugi.Service\Mugi.Service.csproj", "{DBB1E498-2718-4F3A-AE47-E98C6E3A4346}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mugi.Web", "Mugi.Web\Mugi.Web.csproj", "{88FC6DC6-BA32-4AFD-9223-80080BAB56CD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{43382C05-3B71-4976-9348-80B059C4BC9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43382C05-3B71-4976-9348-80B059C4BC9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43382C05-3B71-4976-9348-80B059C4BC9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43382C05-3B71-4976-9348-80B059C4BC9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{995008AF-8178-4CC3-8CE0-853E2B4F0504}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{995008AF-8178-4CC3-8CE0-853E2B4F0504}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{995008AF-8178-4CC3-8CE0-853E2B4F0504}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{995008AF-8178-4CC3-8CE0-853E2B4F0504}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBB1E498-2718-4F3A-AE47-E98C6E3A4346}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBB1E498-2718-4F3A-AE47-E98C6E3A4346}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBB1E498-2718-4F3A-AE47-E98C6E3A4346}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBB1E498-2718-4F3A-AE47-E98C6E3A4346}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88FC6DC6-BA32-4AFD-9223-80080BAB56CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88FC6DC6-BA32-4AFD-9223-80080BAB56CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88FC6DC6-BA32-4AFD-9223-80080BAB56CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88FC6DC6-BA32-4AFD-9223-80080BAB56CD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,219 @@
+﻿
+@using Mugi.Web.Model.ViewModel
+@model AddAdvertisementViewModel
+
+@{
+    ViewData["Title"] = "AddAdvertisement";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+
+<style>
+    .error {
+        color: red;
+    }
+
+    .non-max-with {
+        max-width: none;
+    }
+    /*set a border on the images to prevent shifting*/
+    #gallery_01 img {
+        border: 2px solid white;
+    }
+    /*Change the colour*/
+
+    .active img {
+        border: 2px solid #333 !important;
+    }
+
+    .ui.medium.image.custom {
+        width: 100%;
+    }
+
+    .container.custom {
+        text-align: center;
+    }
+
+    .ui.input input {
+        max-width: none;
+    }
+
+    .error {
+        color: red;
+    }
+</style>
+
+<div class="twelve wide column">
+
+    <div class="ui grid stackable">
+        <div class="sixteen wide column center aligned">
+            <h2 class="ui header">
+                Nhập banner quảng cáo
+            </h2>
+            <form class="ui form" asp-action="AddAdvertisement" asp-controller="Staff" method="post" enctype="multipart/form-data">
+                <div class="two fields">
+                    <div class="field">
+                        <label asp-for="StartDate">Ngày bắt đầu</label>
+                        <div class="ui calendar" id="rangestart">
+                            <div class="ui input left icon">
+                                <i class="calendar icon"></i>
+                                <input asp-for="StartDate" type="text" placeholder="Ngày bắt đầu">
+                            </div><br />
+                            <span asp-validation-for="StartDate" class="error"> </span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label asp-for="EndDate">Ngày kết thúc</label>
+                        <div class="ui calendar" id="rangeend">
+                            <div class="ui input left icon">
+                                <i class="calendar icon"></i>
+                                <input asp-for="EndDate" type="text" placeholder="Ngày kết thúc">
+                            </div><br />
+                            <span asp-validation-for="EndDate" class="error"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="field">
+                    <label asp-for="Image">
+                        <div class="ui mini button">
+                            brower
+                        </div>
+                    </label>
+
+                    <input class="transition hidden" asp-for="Image" type="file" onchange="fileCheck(this);" /><br />
+                    <span asp-validation-for="Image" class="error"></span>
+                </div>
+
+
+                <div class="field">
+                    <label>(Ảnh hình nên vuông)</label>
+                </div>
+                <div class="field">
+                    <div class="container custom">
+                        <div class="ui medium image custom">
+                            <img id="image" style="margin:auto" class="zoomContainer"
+                                 src="/images/ProductImages/slidebar_1.png"
+                                 data-zoom-image="/images/ProductImages/slidebar_1.png" alt="your image" />
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label asp-for="Description">Bài đăng</label>
+                    <textarea asp-for="Description" class="insert-description"></textarea><br />
+                    <span asp-validation-for="Description" class="error"></span>
+                </div>
+                <div class="field">
+                    <button class="ui black button">Submit</button>
+                    @*<button class="ui black button" id="DeleteBtn" type="button">Delete</button>*@
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+@{ string status = TempData["AddAdvertisement"] as string;
+    status = status == null ? "" : status;}
+@switch (status)
+{
+    case "Success":
+        <div class="ui basic modal notification">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p id="Message">Thêm thành công!</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+    case "Failed":
+        <div class="ui basic modal notification">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p id="Message">Thêm thất bại!</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+
+
+}
+
+@section scripts{
+    <script src="~/js/jquery.elevatezoom.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.ui.modal').modal('show');
+            $('#rangestart').calendar({
+                type: 'date',
+                endCalendar: $('#rangeend')
+            });
+            $('#rangeend').calendar({
+                type: 'date',
+                startCalendar: $('#rangestart')
+            });
+            $('#DeleteBtn').on('click', function () {
+                var images = $('.imageDelete');
+                for (var i = 0; i < images.length; i++) {
+                    var image = images[i];
+                    if ($(image).hasClass('active')) {
+                        $('.ui.modal.confirm').modal({
+                            closable: false,
+                            onApprove: function () {
+                                DeteleImage(image);
+                            },
+                            onDeny: function () {
+                                $(this).modal('hide');
+                            }
+                        }).modal('show');
+
+                        return;
+                    }
+                }
+            })
+        })
+
+
+        function fileCheck(input) {
+            var fileExtension = ['jpeg', 'jpg', 'png', 'gif', 'bmp'];
+            if ($.inArray($(input).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                alert("Only '.jpeg','.jpg', '.png', '.gif', '.bmp' formats are allowed.");
+            } else {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        $('#image')
+                            .attr('src', e.target.result)
+                            ;
+                        $('#image').data('-zoom-image', e.target.result);
+                    };
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+
+            }
+        }
+    </script>
+
+}
+
+

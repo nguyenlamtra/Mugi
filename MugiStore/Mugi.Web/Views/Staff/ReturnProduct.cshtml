@@ -1,0 +1,217 @@
+﻿@using Mugi.Web.Model.ViewModel
+@using Mugi.Web.StaticValue
+@model OrderedViewModel
+
+@{
+    ViewData["Title"] = "ReturnProduct";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .ui.collapsing.table.custom {
+        width: 100%;
+    }
+
+    .center.custom {
+        text-align: center;
+    }
+
+    .ui.vertical.accordion.menu.custom {
+        width: 100%;
+    }
+
+    textarea {
+        max-width: none;
+    }
+</style>
+<div class="twelve wide column">
+    <div class="ui segment">
+        <div class="item">
+            <h2 class="ui header center custom">Danh sách đơn hàng đã đặt</h2>
+
+            <div class="ui three column center aligned  stackable grid">
+                <div class="column">Ngày đặt</div>
+                <div class="column">SLSP</div>
+                <div class="column">Tình trạng</div>
+            </div>
+        </div>
+        <div class="item orderId" id="@Model.OrderId">
+            <div class="ui three column center aligned   stackable grid">
+                <div class="column">@Model.CreatedDate</div>
+                <div class="column">@Model.NumberProduct</div>
+
+                @switch (Model.Status)
+                {
+                    case StaticValue.STATUS_HANDLING:
+                        <div class="column status" data-value="@Model.Status">Chưa XL</div>
+                        break;
+                    case StaticValue.STATUS_CONFIRMED:
+                        <div class="column status" data-value="@Model.Status">Đã xác nhận</div>
+                        break;
+                    case StaticValue.STATUS_DENIED:
+                        <div class="column status" data-value="@Model.Status">Đã hủy</div>
+                        break;
+                    case StaticValue.STATUS_DELIVERING:
+                        <div class="column status" data-value="@Model.Status">Đang chuyển</div>
+                        break;
+                    case StaticValue.STATUS_COMPLETED:
+                        <div class="column status" data-value="@Model.Status">Hoàn tất</div>
+                        break;
+                    default:
+                        <div class="column status" data-value="none"></div>
+                        break;
+                }
+
+            </div><br />
+            <div class="content">
+                <table class="ui center aligned collapsing table custom">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên mặt hàng</th>
+                            <th>Thuộc tính</th>
+                            <th>Đơn giá</th>
+                            <th>Số lượng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ var j = 1;}
+                        @foreach (var subItem in Model.SubProductOrderedViewModels)
+                        {
+                            var product = Model.ProductOrderedViewModels.Where(x => x.ProductId == subItem.ProductId).SingleOrDefault();
+                            <tr>
+                                <td>@j</td>
+                                <td>@product.ProductName</td>
+                                <td>
+                                    @foreach (var property in subItem.PropertyDetails)
+                                    {
+                                        <p>@property.PropertyName : @property.PropertyValue</p>
+                                    }
+                                </td>
+                                <td>@product.Price</td>
+                                <td>
+                                    <div class="ui scrolling dropdown" id="@subItem.SubProductId">
+                                        <div class="text">SL</div>
+                                        <i class="dropdown icon"></i>
+                                        <div class="menu">
+                                            @for (int i = 1; i <= @subItem.NumberSubProduct; i++)
+                                            {
+                                                if (i == 1)
+                                                {
+                                                    <div class="item active selected" data-value="@i">@i</div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="item" data-value="@i">@i</div>
+                                                }
+
+                                            }
+                                        </div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                            j++;
+                        }
+                    </tbody>
+                </table>
+                <div class="ui segment">
+                    <div class="ui form">
+                        <h3 class="ui header  center aligned">Lý do trả</h3>
+                        <div class="field">
+                            <textarea name="Reason" id="Reason"></textarea>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="ui container center aligned ">
+                    <a class="ui button" id="submit">Tiến hành trả hàng</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="ui basic modal">
+    <div class="ui icon header">
+        <i class="archive icon"></i>
+        Messages
+    </div>
+    <div class="content" style="text-align: center">
+        <p id="message"></p>
+    </div>
+    <div class="actions" style="text-align: center">
+        <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Ok
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('.ui.accordion')
+                .accordion()
+                ;
+
+            $('.ui.scrolling.dropdown').each(function () {
+                var temp = $(this).find('.item.active.selected').data('value');
+                console.log(temp);
+                $(this).dropdown('set selected', temp);
+            });
+            $('#submit').on('click', function () {
+                var id = parseInt($('.orderId').attr('id'));
+                if (id != 0) {
+                    var listProductReturn = [];
+                    $('.ui.scrolling.dropdown').each(function () {
+                        var subProductId = parseInt($(this).attr('id'));
+                        var productReturn = parseInt($(this).dropdown('get value'));
+
+                        if (!isNaN(productReturn) && productReturn > 0 && !isNaN(subProductId))
+                            listProductReturn.push({ subProductId: subProductId, quantity: productReturn });
+                    })
+                    if (listProductReturn.length >= 0) {
+                        var reason = $('#Reason').val();
+                        console.log(reason);
+                        var returnProduct = { orderId: id, subProducts: listProductReturn, reason: reason };
+                        returnProduct = JSON.stringify(returnProduct);
+                        console.log(returnProduct);
+                        $.ajax({
+                            url: "@Url.Action("ReturnProduct","Staff")",
+                            data: returnProduct,
+                            type: "POST",
+                            contentType: 'application/json',
+                            dataType: 'json',
+                            success: function (data) {
+                                switch (data) {
+                                    case 'Success':
+                                        $('#message').text('Trả hàng thành công');
+                                        break;
+                                    case 'Failed':
+                                        $('message').text('Trả hàng thất bại');
+                                        break;
+                                    case 'Error':
+                                        $('message').text('Trả hàng lỗi!');
+                                        break;
+                                }
+                                $('.ui.modal').modal({
+                                    closable: false,
+                                    onApprove: function () {
+                                        window.location = "@Url.Action("ListOrder","Staff")";
+                                    }
+
+                                }).modal('show');
+                            },
+                            error: function () {
+                                console.log('error');
+                            }
+                        })
+                    }
+                    console.log(listProductReturn);
+                }
+
+            })
+        })
+
+    </script>
+}

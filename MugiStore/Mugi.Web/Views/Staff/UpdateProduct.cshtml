@@ -1,0 +1,144 @@
+﻿@using Mugi.Web.Model.ViewModel
+
+@model UpdateProductViewModel
+@{
+    ViewData["Title"] = "UpdateProduct";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .ui.medium.image.custom {
+        width: 350px;
+    }
+
+    .error {
+        color: red;
+    }
+
+    .non-max-with {
+        max-width: none;
+    }
+
+    .ui.fluid.search.dropdown.selection{
+        max-width:280px;
+    
+    }
+    textarea{
+       max-width:none;
+    }
+</style>
+@{
+    var status = TempData["UpdateProduct"] as string;
+    switch (status)
+    {
+        case "Success":
+            <div class="ui basic modal">
+                <div class="ui icon header">
+                    <i class="archive icon"></i>
+                    Messages
+                </div>
+                <div class="content" style="text-align: center">
+                    <p>Mặt hàng đã được chỉnh sửa thành công!</p>
+                </div>
+                <div class="actions" style="text-align: center">
+                    <div class="ui green ok inverted button">
+                        <i class="checkmark icon"></i>
+                        Ok
+                    </div>
+                </div>
+            </div>
+            break;
+        case "Failed":
+
+            <div class="ui basic modal">
+                <div class="ui icon header">
+                    <i class="archive icon"></i>
+                    Messages
+                </div>
+                <div class="content" style="text-align: center">
+                    <p>Chỉnh sửa mặt hàng thất bại!</p>
+                </div>
+                <div class="actions" style="text-align: center">
+                    <div class="ui green ok inverted button">
+                        <i class="checkmark icon"></i>
+                        Ok
+                    </div>
+                </div>
+            </div>
+            break;
+    }
+}
+<div class="twelve wide column">
+
+    <form asp-controller="Staff" asp-action="UpdateProduct" method="post" class="ui form" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+        <div class="ui segment">
+            <div class="ui grid stackable">
+                <div class="sixteen wide column center aligned">
+                    <h2 class="header">
+                        Chỉnh sửa thông tin sản phẩm
+                    </h2>
+                </div>
+                <div class="sixteen wide column">
+                    <div class="ui container">
+                        <div class="ui form">
+                            <div class="field">
+                                <label asp-for="ProductName">Tên sản phẩm</label>
+                                <input asp-for="ProductName" class="insert-name"/>
+                                <span asp-validation-for="ProductName" class="error"></span>
+                            </div>
+                            <div class="field">
+                                <label asp-for="Price">Giá</label>
+                                <input class="insert-price" type="text" asp-for="Price" />
+                                <span asp-validation-for="Price" class="error"></span>
+                            </div>
+                            <div class="field">
+                                <label asp-for="SupplierId">Nhà cung cấp</label>
+                                <select asp-for="SupplierId" asp-items="@(new SelectList(Model.Suppliers,"Id","Name"))" class="ui fluid search dropdown ">
+                                    <option value="">Nhà cung cấp</option>
+                                </select>
+                                
+                            </div>
+                            <span asp-validation-for="SupplierId" class="error"></span>
+                            <div class="field">
+                                <label asp-for="SubCategoryId">Loại sản phẩm</label>
+                                <select asp-for="SubCategoryId" asp-items="@(new SelectList(Model.SubCategories,"Id","Name"))" class="ui fluid search dropdown ">
+                                    <option value="">Loại mặt hàng</option>
+                                </select>
+                               
+                            </div>
+                            <span asp-validation-for="SubCategoryId" class="error"></span>
+                            <div class="field">
+                                <label asp-for="Description">Mô tả</label>
+                                <textarea asp-for="Description" class="insert-description"></textarea>
+                                <span asp-validation-for="Description" class="error"></span>
+                            </div>
+                           
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sixteen wide column center aligned">
+                    <button class="ui black button"  type="submit">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('.ui.dropdown').dropdown();
+            $('.ui.modal').modal({
+                closable: false
+            }).modal('show');
+        })
+    </script>
+}
+
+
+
+

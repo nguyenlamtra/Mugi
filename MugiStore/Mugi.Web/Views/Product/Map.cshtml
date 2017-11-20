@@ -1,0 +1,52 @@
+﻿
+@{
+    ViewData["Title"] = "Map";
+    Layout = "~/Views/Shared/_HomePageLayout.cshtml";
+}
+<style>
+    .center.custom{
+        text-align:center;
+    }
+</style>
+<div class="eight wide column">
+
+    <div id="map" style="width:100%;height:500px"></div>
+
+    <script>
+        function myMap() {
+            var myCenter = new google.maps.LatLng(10.885242, 106.781771);
+            var mapCanvas = document.getElementById("map");
+            var mapOptions = { center: myCenter, zoom: 15  };
+            var map = new google.maps.Map(mapCanvas, mapOptions);
+            var marker = new google.maps.Marker({ position: myCenter });
+            marker.setMap(map);
+
+            // Zoom to 9 when clicking on marker
+            google.maps.event.addListener(marker, 'click', function () {
+                map.setZoom(9);
+                map.setCenter(marker.getPosition());
+            });
+        }
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEgjIHLnmPUx746OrLOuxUdCQazHRo8YU&callback=myMap"></script>
+</div>
+<div class="eight wide column">
+    <div class="field center custom">
+        <h2>Thông tin liên hệ</h2>
+    </div><br /><br />
+    <div class="field">
+        <h3>Địa chỉ: Ktx Khu B ĐHQG, Dĩ An, Bình Dương.</h3>
+    </div><br />
+    <div class="field">
+        <h3>Số điện thoại: 01644593272 (Anh Trà).</h3>
+    </div><br />
+    <div class="field">
+        <h3>Giờ mở cửa: Tất cả các ngày trong tuần từ </h3>
+        <h3>08:00 am - 22h00pm.</h3>
+    </div><br />
+</div>
+
+@section Scripts{ 
+    <script src="~/js/jquery.elevatezoom.js"></script>
+}

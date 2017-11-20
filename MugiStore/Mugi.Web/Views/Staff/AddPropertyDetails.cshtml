@@ -1,0 +1,84 @@
+﻿@using Mugi.Web.Model.ViewModel
+@model AddPropertyDetailsViewModel
+@{
+    ViewData["Title"] = "AddPropertyDetails";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .ui.search.dropdown {
+        max-width: 280px !important;
+    }
+    .error{
+        color:red;
+    }
+</style>
+
+<div class="twelve wide column">
+
+    <form asp-controller="Staff" asp-action="AddPropertyDetails" method="post" class="ui form">
+        <div class="ui segment">
+            <div class="ui grid stackable">
+                <div class="sixteen wide column">
+                    <h2 class="header">
+                        Nhập giá trị thuộc tính
+                    </h2>
+                </div>
+                <div class="sixteen wide column">
+                    <div class="ui container">
+                        <div class="field">
+                            <label asp-for="PropertyId">Tên thuộc tính</label>
+                            <select asp-for="PropertyId" asp-items="@(new SelectList(Model.Properties,"Id","Name"))" class="ui search dropdown"></select>
+                            <span asp-validation-for="PropertyId" class="error"></span>
+                        </div>
+                        <div class="field">
+                            <label asp-for="PropertyValue">Giá trị thuộc tính</label>
+                            <input asp-for="PropertyValue" class="insert-name"/><br />
+                            <span asp-validation-for="PropertyValue" class="error"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sixteen wide column">
+                    <div class="field">
+                        <span id="exist" class="error"></span>
+                    </div>
+
+                    <button class="ui black button" id="AddCategory" type="submit">Submit</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    @{ var temp = TempData["AddPropertyDetails"] as string;}
+    @if (temp!=null)
+    {
+        <div class="ui basic modal">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p>Thêm thành công!</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+    }
+
+
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('.ui.modal').modal('show');
+            $('.ui.dropdown').dropdown();
+        })
+    </script>
+
+}
+

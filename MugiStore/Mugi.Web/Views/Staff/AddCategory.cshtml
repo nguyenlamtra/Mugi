@@ -1,0 +1,274 @@
+﻿@using Mugi.Web.Model.ViewModel
+@model AddCategoryViewModel
+
+@{
+    ViewData["Title"] = "AddCategory";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+<style>
+    .error {
+        color: red;
+    }
+
+    .ui.container.scroll {
+        overflow-y: scroll;
+        max-height: 77vh;
+    }
+    textarea, input {
+        max-width: none;
+    }
+</style>
+
+<div class="twelve wide column">
+
+    <form asp-controller="Staff" asp-action="AddCategory" method="post" class="ui form">
+        <input type="hidden" asp-for="Id" />
+        <div class="ui segment">
+            <div class="ui grid stackable">
+                <div class="sixteen wide column center aligned">
+                    <h2 class="header">
+                        Nhập nhóm mặt hàng
+                    </h2>
+                </div>
+                <div class="eight wide column  center aligned">
+                    <div class="ui container">
+
+                        <div class="field">
+                            <label asp-for="CategoryName">Tên loại sản phẩm</label>
+                            <input asp-for="CategoryName" class="insert-name" />
+                            <span asp-validation-for="CategoryName" class="error"></span>
+                        </div>
+
+                        <div class="field">
+                            <label asp-for="CategoryDescription">Mô tả</label>
+                            <textarea asp-for="CategoryDescription" class="insert-description"></textarea>
+                            <span asp-validation-for="CategoryDescription" class="error"></span>
+                        </div>
+                        <button class="ui black button" id="AddCategoryBtn" type="button">Thêm</button>
+                        <button class="ui black button transition hidden" id="UpdateCategoryBtn" type="button">Sửa</button>
+                        <button class="ui black button transition hidden" id="CancelBtn" type="button">Hủy</button>
+                        <button class="ui black button transition hidden" id="SubCategoryBtn" type="button">DS loại con</button>
+                        <button class="ui black button transition hidden" id="DeleteCategoryBtn" type="button">Xóa</button>
+                    </div>
+                </div>
+
+                <div class="eight wide column">
+                    <div class="ui container scroll">
+                        <table class="ui basic table center aligned">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Tên loại mặt hàng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var i in Model.Categories)
+                                {
+                                    <tr class="row">
+                                        <td class="category-id" data-id="@i.Id">@i.Id</td>
+                                        <td class="category-name" data-name="@i.Name">@i.Name</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="sixteen wide column">
+                    <div class="field">
+                        <span id="errors" class="error"></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+    <form asp-controller="Staff" asp-action="AddSubCategory" id="SubCategoriesForm" method="get">
+        <input type="hidden" id="CategoryId" name="CategoryId" />
+    </form>
+    <div class="ui basic modal">
+        <div class="ui icon header">
+            <i class="archive icon"></i>
+            Messages
+        </div>
+        <div class="content" style="text-align: center">
+            <p id="message">Thêm thành công!</p>
+        </div>
+        <div class="actions" style="text-align: center">
+            <div class="ui green ok inverted button">
+                <i class="checkmark icon"></i>
+                Ok
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+@section scripts{
+
+
+    <script>
+
+        function insertOrUpdateCategory() {
+                var categoryName = $('#CategoryName').val();
+                var categoryDescription = $('#CategoryDescription').val();
+                var id = parseInt($('#Id').val());
+                var viewModel = JSON.stringify({id: id, categoryName: categoryName, categoryDescription: categoryDescription } );
+                console.log(viewModel);
+                $.ajax({
+                    url: "@Url.Action("AddOrUpdateCategory", "Staff")" ,
+                    data: viewModel,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function (data) {
+                        switch (data.status) {
+                            case 'InsertSuccess':
+                                $('#message').text('Thêm loại sản phẩm thành công');
+                                $('.ui.modal').modal({
+                                    onApprove: function () {
+                                        location.reload();
+                                    }
+                                }).modal('show');
+                                break;
+                            case 'UpdateSuccess':
+                                $('#message').text('Cập nhật loại sản phẩm thành công');
+                                $('.ui.modal').modal({
+                                    onApprove: function () {
+                                        location.reload();
+                                    }
+                                }).modal('show');
+                                break;
+                            case 'InsertFailed':
+                                $('#message').text('Thêm loại sản phẩm thất bại, tên sản phẩm trùng hoặc vì lí do khác!');
+                                $('.ui.modal').modal('show');
+                                break;
+                            case 'UpdateFailed':
+                                $('#message').text('Cập nhật loại sản phẩm thất bại, tên sản phẩm trùng hoặc vì lí do khác!');
+                                $('.ui.modal').modal('show');
+                                break;
+                            case 'Error':
+                                for (var i = 0; i < data.errors.length; i++) {
+                                    for (var j = 0; j < data.errors[i].length; j++) {
+                                        $('#errors').append('<p>' + data.errors[i][j].errorMessage + '</p>');
+                                    }
+                                }
+                                break;
+                        }
+                    },
+                    error: function () {
+                        console.log('error');
+                    }
+                })
+        }
+        function deleteSubCategory() {
+            $('.row').each(function () {
+                if ($(this).hasClass('active')) {
+                    var currentRow = $(this);
+                    var id = $(this).find('.category-id').data('id');
+                    console.log('category delete: ' + id);
+                    $('#message').text('Xác nhận xóa loại sản phẩm?');
+                    $('.ui.modal').modal({
+                        onApprove: function () {
+                            $.ajax({
+                                url: "@Url.Action("DeleteCategory","Staff")",
+                                data: { "categoryId": id },
+                                type: 'POST',
+                                success: function (data) {
+                                    if (data == true) {
+                                        $('#message').text('Xóa thành công');
+                                        $('.ui.modal').modal('show').modal({ onApprove: function () { $('.ui.modal').modal('hide') } });
+                                        currentRow.remove();
+                                        setButtonDefault();
+                                    } else {
+                                        $('#message').text('Xóa thất bại');
+                                        $('.ui.modal').modal('show').modal({
+                                            onApprove: function () {
+                                                $('.ui.modal').modal('hide');
+                                            }
+                                        })
+                                    }
+                                },
+                                error: function () {
+                                    console.log('delete subcategory error');
+                                }
+                            })
+                        }
+                    }).modal('show');
+                }
+            })
+        }
+
+        function setButtonDefault() {
+            $('#UpdateCategoryBtn').transition('hide');
+            $('#CancelBtn').transition('hide');
+            $('#SubCategoryBtn').transition('hide');
+            $('#DeleteCategoryBtn').transition('hide');
+            $('#AddCategoryBtn').transition('show');
+
+
+            $("#Id").val('');
+            $("#CategoryName").val('');
+            $("#CategoryDescription").val('');
+        }
+
+        $(document).ready(function () {
+            $('#SubCategoryBtn').on('click', function () {
+                $('#CategoryId').val($('#Id').val());
+
+                $('#SubCategoriesForm').submit();
+            })
+
+
+            $('#DeleteCategoryBtn').on('click', function () {
+                deleteSubCategory();
+            })
+
+
+
+            $('#UpdateCategoryBtn').on('click', function () {
+                insertOrUpdateCategory();
+            })
+
+
+            $('#CancelBtn').on('click', function () {
+                setButtonDefault()
+                $(".row").removeClass('active');
+            })
+            $('.row').on('click', function () {
+                $(this).addClass('active');
+                $(this).siblings().removeClass('active');
+                var categoryId = $(this).find('.category-id').data('id');
+                var categoryName = $(this).find('.category-name').data('name');
+                var categoryDescription = '';
+                $.ajax({
+                    url: "@Url.Action("GetDescriptionCategory","Staff")",
+                    data: { "categoryId": categoryId },
+                    type: 'GET',
+                    success: function (data) {
+                        categoryDescription = data;
+                        console.log('success');
+                    },
+                    error: function () {
+                        console.log('error');
+                    },
+                    async: false
+                })
+                $("#Id").val(categoryId);
+                $("#CategoryName").val(categoryName);
+                $("#CategoryDescription").val(categoryDescription);
+                $('#UpdateCategoryBtn').transition('show');
+                $('#CancelBtn').transition('show');
+                $('#SubCategoryBtn').transition('show');
+                $('#DeleteCategoryBtn').transition('show');
+                $('#AddCategoryBtn').transition('hide');
+            })
+            $('#AddCategoryBtn').on('click', function () {
+                insertOrUpdateCategory();
+                })
+        })
+
+    </script>
+}

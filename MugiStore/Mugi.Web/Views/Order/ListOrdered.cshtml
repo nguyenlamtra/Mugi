@@ -1,0 +1,147 @@
+﻿@using Mugi.Web.Model.ViewModel
+@using Mugi.Web.StaticValue
+@model List<OrderedViewModel>
+
+@{
+    ViewData["Title"] = "ListOrdered";
+    Layout = "~/Views/Shared/_HomePageLayout.cshtml";
+}
+<style>
+    .ui.collapsing.table.custom {
+        width: 100%;
+    }
+
+    .center.custom {
+        text-align: center;
+    }
+
+    .ui.vertical.accordion.menu.custom {
+        width: 100%;
+    }
+    #scroll {
+        overflow-y: scroll;
+        height: 80vh;
+    }
+</style>
+<div class="sixteen wide column">
+    <br /><h2 class="ui header center custom">Danh sách đơn hàng đã đặt</h2><br />
+    <div class="ui center aligned vertical accordion menu custom" id="scroll">
+        <div class="ui small header item">
+            <a class="title">
+                <div class="ui five column stackable grid">
+                    <div class="column">STT</div>
+                    <div class="column">Ngày đặt</div>
+                    <div class="column">SLSP</div>
+                    <div class="column">HTTT</div>
+                    <div class="column">Tình trạng</div>
+                    @*<div class="column">Task</div>*@
+                </div>
+            </a>
+        </div>
+        @{ var i = 1;}
+        @foreach (var item in Model)
+            {
+            <div class="item ExpandOrderDetails" id="@item.OrderId">
+                <div class="title">
+                    <div class="ui five column stackable grid">
+                        <div class="column">@i</div>
+                        <div class="column">@item.CreatedDate</div>
+                        <div class="column">@item.NumberProduct</div>
+                        @if (item.PaymentType == "PayPal")
+                        {
+                            <div class="column">PayPal</div>
+                        }
+                        else
+                        {
+                            <div class="column">Khi nhận</div>
+                        }
+                        <div class="column">
+                            @switch (@item.Status)
+                            {
+                                case StaticValue.STATUS_HANDLING:
+                                    <div class="column status" data-value="@item.Status">Chưa XL</div>
+                                    break;
+                                case StaticValue.STATUS_CONFIRMED:
+                                    <div class="column status" data-value="@item.Status">Đã xác nhận</div>
+                                    break;
+                                case StaticValue.STATUS_DENIED:
+                                    <div class="column status" data-value="@item.Status">Đã hủy</div>
+                                    break;
+                                case StaticValue.STATUS_DELIVERING:
+                                    <div class="column status" data-value="@item.Status">Đang giao</div>
+                                    break;
+                                case StaticValue.STATUS_COMPLETED:
+                                    <div class="column status" data-value="@item.Status">Hoàn tất</div>
+                                    break;
+                                default:
+                                    <div class="column status" data-value="none"></div>
+                                    break;
+                            }
+                        </div>
+                        @*<div class="column">
+                            <a href="@Url.Action("Payment", "Order",new { orderId = item.OrderId })" class="ui mini compact black button Cancel">Thanh toán</a>
+                            <a href="@Url.Action("Cancel", "Order",new { orderId = item.OrderId })" class="ui mini compact black button Cancel">Hủy</a>
+                        </div>*@
+                    </div>
+                </div>
+                <div class="content">
+                    <table class="ui center aligned collapsing table custom">
+                        <thead>
+                            <tr>
+                                <th>Tên mặt hàng</th>
+                                <th>Thuộc tính</th>
+                                <th>Đơn giá</th>
+                                <th>Số lượng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var subItem in item.SubProductOrderedViewModels)
+                            {
+                                var product = item.ProductOrderedViewModels.Where(x => x.ProductId == subItem.ProductId).SingleOrDefault();
+                                <tr>
+                                    <td>@product.ProductName</td>
+                                    <td>
+                                        @foreach (var property in subItem.PropertyDetails)
+                                        {
+                                            <p>@property.PropertyName : @property.PropertyValue</p>
+                                        }
+                                    </td>
+                                    <td>@product.Price</td>
+                                    <td>@subItem.NumberSubProduct</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+                                    i++;
+                                }
+
+    </div>
+
+
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('.ui.accordion')
+                .accordion()
+                ;
+            @*$(".ExpandOrderDetails").on('click', function () {
+                $.ajax({
+                    url: "@Url.Action("OrderDetails","Order")",
+                    contentType: "application/json",
+                    dataType: 'json',
+                    type:'POST'
+                }).done(function () {
+                    $(this).append('<p>done</p>')
+                    }).fail(function () {
+
+                })
+            })*@
+
+        })
+
+    </script>
+}
+

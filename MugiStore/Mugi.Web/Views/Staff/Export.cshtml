@@ -1,0 +1,163 @@
+﻿@using Mugi.Web.StaticValue
+@using Mugi.Web.Model.ViewModel
+@model OrderedViewModel
+@{
+    ViewData["Title"] = "Export";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .ui.collapsing.table.custom {
+        width: 100%;
+    }
+
+    .center.custom {
+        text-align: center;
+    }
+
+    .ui.vertical.accordion.menu.custom {
+        width: 100%;
+    }
+</style>
+<div class="twelve wide column">
+        <div class="ui segment" id="printPDF">
+
+            <div class="item">
+                <h2 class="ui header center custom">Thông tin hóa đơn</h2>
+
+                <div class="ui four column center aligned  stackable grid">
+                    <div class="column">Ngày đặt</div>
+                    <div class="column">SLSP</div>
+                    <div class="column">Tên khách hàng</div>
+                    <div class="column">Hình thức thanh toán</div>
+                </div>
+            </div>
+            <div class="item" id="@Model.OrderId">
+                <div class="ui four column center aligned   stackable grid">
+                    <div class="column">@Model.CreatedDate</div>
+                    <div class="column">@Model.NumberProduct</div>
+                    <div class="column">@Model.CustomerName</div>
+                @if (Model.PaymentType == "PayPal")
+                {
+                    <div class="column"> Qua PayPal</div>
+                }
+                else
+                {
+                    <div class="column">Khi nhận</div>
+                }
+
+                </div><br />
+                <div class="content">
+                    <table class="ui center aligned collapsing table custom">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên mặt hàng</th>
+                                <th>Thuộc tính</th>
+                                <th>Đơn giá</th>
+                                <th>Số lượng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ var j = 1;}
+                            @foreach (var subItem in Model.SubProductOrderedViewModels)
+                            {
+                                var product = Model.ProductOrderedViewModels.Where(x => x.ProductId == subItem.ProductId).SingleOrDefault();
+                                <tr>
+                                    <td>@j</td>
+                                    <td>@product.ProductName</td>
+                                    <td>
+                                        @foreach (var property in subItem.PropertyDetails)
+                                        {
+                                            <p>@property.PropertyName : @property.PropertyValue</p>
+                                        }
+                                    </td>
+                                    <td>@product.Price</td>
+                                    <td>@subItem.NumberSubProduct</td>
+                                </tr>
+                                j++;
+                            }
+                            <tr>
+                                <td colspan="5" style="text-align:right">Tổng tiền: @Model.Total</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="ui segment">
+                        <div class="field">
+                            Số điện thoại: @Model.PhoneNumber
+                        </div>
+                        <div class="field">
+                            Địa chỉ: @Model.Address
+                        </div>
+                    </div>
+                    <div class="ui segment">
+                        <div class="ui stackable grid">
+                            <div class="ten wide column">
+
+                            </div>
+                            <div class="six wide column">
+                                Khách hàng kí tên:
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+        <div class="ui container center aligned">
+            <button class="ui button" id="cmd" onclick="GenPDF();">Xuất hóa đơn</button>
+        </div>
+  
+</div>
+@{ var temp = TempData["OrderDetails"] as string;}
+@if (temp == "Failed")
+{
+    <div class="ui basic modal">
+        <div class="ui icon header">
+            <i class="archive icon"></i>
+            Messages
+        </div>
+        <div class="content" style="text-align: center">
+            <p>Thay đổi trạng thái đơn hàng thất bại!</p>
+        </div>
+        <div class="actions" style="text-align: center">
+            <div class="ui green ok inverted button">
+                <i class="checkmark icon"></i>
+                Ok
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('.ui.accordion')
+                .accordion()
+                ;
+        })
+        function GenPDF() {
+
+
+
+            html2canvas(document.getElementById('printPDF'), {
+                onrendered: function (canvas) {
+                    var img = canvas.toDataURL("image/png");
+                    //var doc = new jsPDF("l", "pt", "letter");
+                    var doc = new jsPDF("p", "mm", "a4");
+
+                    var width = doc.internal.pageSize.width;
+                    //var height = doc.internal.pageSize.height;
+                    //doc.addImage(img, 'JPEG', 60, 0,0,0);
+                  
+
+                    doc.addImage(img, 'JPEG', 0, 0, width, 0);
+                    doc.save('test.pdf');
+
+                }
+
+            })
+
+        }
+       
+    </script>
+}

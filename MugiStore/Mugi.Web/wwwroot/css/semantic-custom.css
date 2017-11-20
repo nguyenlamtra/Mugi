@@ -1,0 +1,27 @@
+﻿/* Set default font */
+.ui.button,
+.ui.cards > .card > .content > .header, .ui.card > .content > .header,
+.ui.header,
+.ui.menu,
+.ui.input input {
+    font-family: 'Comfortaa', cursive;
+}
+
+/* Header */
+.ui.menu .item > img:not(.ui) {
+    margin-right: 20px;
+}
+
+.ui.menu .item:before {
+    width: 0;
+}
+
+/* Footer */
+.ui.footer.segment {
+    margin: 5em 0em 0em;
+    padding: 5em 0em;
+}
+
+.footer.segment {
+    padding: 5em 0em;
+}

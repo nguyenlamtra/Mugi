@@ -1,0 +1,100 @@
+﻿@using Mugi.Web.Model.ViewModel
+@using Mugi.Web.StaticValue
+@model PayViewModel
+@{
+    ViewData["Title"] = "Pay";
+    Layout = "~/Views/Shared/_HomePageLayout.cshtml";
+}
+
+<div class="sixteen wide column">
+    <div class="field center aligned">
+        <h2 class="ui header" style="text-align:center">Đơn hàng của bạn</h2>
+    </div>
+
+    <table class="ui very basic table" style="width:100%">
+        <thead>
+            <tr>
+                <th class="center aligned">Tên sản phẩm</th>
+                <th class="center aligned">Số lượng</th>
+                <th class="center aligned">Đơn giá</th>
+                <th class="center aligned">Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ShopCartViewModels)
+            {
+                int sum; int price;
+                if (item.PromotionPercent != 0)
+                {
+                    sum = item.Price * item.ProductOrder - item.Price * item.ProductOrder * item.PromotionPercent / 100;
+                    price = item.Price - item.Price * item.PromotionPercent / 100;
+                }
+                else
+                {
+                    sum = item.Price * item.ProductOrder;
+                    price = item.Price;
+                }
+
+                <tr>
+                    <td class="center aligned">@item.ProductName</td>
+                    <td class="center aligned">@item.ProductOrder</td>
+                    <td class="center aligned">@price</td>
+                    <td class="center aligned">@sum</td>
+                </tr>
+            }
+
+        </tbody>
+        <tfoot>
+            <tr>
+                <td class="center align" colspan="4">
+                    <div class="container center aligned header">
+                        <h3 class="header" style="text-align:center">Tổng tiền: @Model.Total</h3>
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    <div class="ui grid stackable">
+        <div class="sixteen wide column center aligned">
+            @{ string paymentType = TempData["PaymentType"] as string;}
+            @if (paymentType.Equals("PayPal"))
+            {
+               int total = Model.Total / 22;
+                <form action="@StaticValue.URL_SUBMIT_PAYMENT" method="post">
+
+                    <!-- Nhập địa chỉ email người nhận tiền (người bán) -->
+                    <input type="hidden" name="business" value="@StaticValue.ACCOUNT_BUSINESS">
+
+                    <!-- tham số cmd có giá trị _xclick chỉ rõ cho paypal biết là người dùng nhất nút thanh toán -->
+                    <input type="hidden" name="cmd" value="_xclick">
+
+                    <!-- Thông tin mua hàng. -->
+                    <input type="hidden" name="item_name" value="HoaDonMuaHang">
+                    <!--Trị giá của giỏ hàng, vì paypal không hỗ trợ tiền việt nên phải đổi ra tiền $-->
+                    <input type="hidden" name="amount" placeholder="Nhập số tiền vào" value="@total">
+                    <!--Loại tiền-->
+
+                    <input type="hidden" name="currency_code" value="USD">
+
+                    <!--Đường link mình cung cấp cho Paypal biết để sau khi xử lí thành công nó sẽ chuyển về theo đường link này-->
+
+                    <input type="hidden" name="return" value="http://localhost:12345/Order/Success">
+
+                    <!--Đường link mình cung cấp cho Paypal biết để nếu  xử lí KHÔNG thành công nó sẽ chuyển về theo đường link này-->
+
+                    <input type="hidden" name="cancel_return" value="http://localhost:12345/Test">
+
+                    <!-- Nút bấm. -->
+
+                    <input type="image" name="submit"
+                           src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif"
+                           alt="PayPal - The safer, easier way to pay online">
+                    <img alt="" width="1" height="1"
+                         src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif">
+                </form>
+    }
+
+        </div>
+    </div>
+
+</div>

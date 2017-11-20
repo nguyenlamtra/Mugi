@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Mugiwara</title>
+    <environment names="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/js/semantic.js"></script>
+    </environment>
+    @*@Styles.Render("~/css/semantic")
+    @Styles.Render("~/css/semantic-custom")
+    @Styles.Render("~/css/site")
+    @Styles.Render("~/css/dashboard")
+    @Scripts.Render("~/js/modernizr")*@
+</head>
+<body>
+    <div class="pusher">
+        <div class="" id="sidebar">
+            <div class="ui vertical inverted labeled icon menu visible">
+                <a class="item">
+                    <i class="home icon"></i>
+                    Home
+                </a>
+                <a class="item">
+                    <i class="block layout icon"></i>
+                    Topics
+                </a>
+                <a class="item">
+                    <i class="smile icon"></i>
+                    Friends
+                </a>
+            </div>
+        </div>
+        <div id="content">
+            <div class="ui masthead vertical segment">
+                <div class="ui container">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*@Scripts.Render("~/js/jquery")
+    @Scripts.Render("~/js/semantic")
+    @Scripts.Render("~/js/dashboard")*@
+    @RenderSection("scripts", required: false)
+</body>
+</html>
