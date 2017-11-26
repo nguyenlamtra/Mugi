@@ -1487,7 +1487,7 @@ namespace Mugi.Web.Controllers
                         .SingleOrDefault().Price * orderSubProduct.Quantity,
                         ProductId = orderSubProduct.SubProduct.ProductId,
                         TotalPay = GoodsReceiptSubProductService
-                        .GetTotalPay(orderSubProduct.SubProductId, orderSubProduct.Quantity)
+                        .GetTotalPay(orderSubProduct.SubProductId, orderSubProduct.Quantity, orderSubProduct.Order.CreatedDate)
                     });
                 }
             }

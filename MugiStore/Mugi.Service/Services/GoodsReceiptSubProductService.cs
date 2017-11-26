@@ -8,7 +8,7 @@ namespace Mugi.Service.Services
 {
     public interface IGoodsReceiptSubProductService
     {
-        decimal GetTotalPay(int subProductId, int quantity);
+        decimal GetTotalPay(int subProductId, int quantity, DateTime createDate);
     }
 
     public class GoodsReceiptSubProductService : IGoodsReceiptSubProductService
@@ -20,7 +20,7 @@ namespace Mugi.Service.Services
             UnitOfWork = unitOfWork;
         }
 
-        public decimal GetTotalPay(int subProductId, int quantity)
+        public decimal GetTotalPay(int subProductId, int quantity, DateTime createDate)
         {
             int skip = 0, take = 1;
             decimal totalPay = 0;
@@ -31,7 +31,7 @@ namespace Mugi.Service.Services
                     , includeProperties: "SubProduct,GoodsReceipt,GoodsReceipt.GoodsReceiptProducts").SingleOrDefault();
                 var goodsReceiptProduct = goodsReceiptSubProduct.GoodsReceipt
                     .GoodsReceiptProducts.Where(x => x.ProductId == goodsReceiptSubProduct.SubProduct.ProductId).SingleOrDefault();
-                if (goodsReceiptSubProduct.Quantity < quantity)
+                if (goodsReceiptSubProduct.Quantity < quantity && createDate > goodsReceiptSubProduct.GoodsReceipt.CreatedDate)
                 {
                     totalPay += goodsReceiptSubProduct.Quantity * goodsReceiptProduct.PriceInsert;
                     quantity -= goodsReceiptSubProduct.Quantity;
