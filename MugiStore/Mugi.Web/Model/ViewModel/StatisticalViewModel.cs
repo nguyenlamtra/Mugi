@@ -8,6 +8,5 @@ namespace Mugi.Web.Model.ViewModel
     public class StatisticalViewModel
     {
         public StatisticalModel StatisticalModel { get; set; }
-        public StatisticalTableModel StatisticalTableModel { get; set; }
     }
 }

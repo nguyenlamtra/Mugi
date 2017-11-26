@@ -11,6 +11,6 @@ namespace Mugi.Domain.Entities
         public string SupplierName { get; set; }
 
         public virtual ICollection<Product> Products { get; set; }
-        public virtual IEnumerable<ShopOrder> ShopOrders { get; set; }
+        //public virtual IEnumerable<ShopOrder> ShopOrders { get; set; }
     }
 }

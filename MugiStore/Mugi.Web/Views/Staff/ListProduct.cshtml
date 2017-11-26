@@ -107,7 +107,7 @@
                             <th class="center aligned">Tên sản phẩm</th>
                             <th class="center aligned">Tên NCC</th>
                             <th class="center aligned">Số lượng tồn</th>
-                            <th class="center aligned">Giá</th>
+                            <th class="center aligned">Giá (VNĐ)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -118,7 +118,7 @@
                                 <td class="center aligned">@item.ProductName</td>
                                 <td class="center aligned">@item.SupplierName</td>
                                 <td class="center aligned">@item.ProductLeft</td>
-                                <td class="center aligned">@item.Price</td>
+                                <td class="center aligned">@item.Price.ToString("#,##")</td>
                             </tr>
 
                         }

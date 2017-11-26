@@ -281,6 +281,7 @@ namespace Mugi.Web.Controllers
                     client.Authenticate("nguyenlamtra95@gmail.com", "0913499062");
                     client.Send(message);
                     client.Disconnect(true);
+                    client.Timeout = 5000;
                 }
             }
             catch(Exception e)

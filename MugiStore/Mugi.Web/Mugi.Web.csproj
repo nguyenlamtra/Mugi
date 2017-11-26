@@ -41,9 +41,6 @@
     <None Include="Views\Customer\CustomerProfile.cshtml" />
     <None Include="Views\Customer\LoginCustomer.cshtml" />
     <None Include="Views\Customer\RegisterCustomer.cshtml" />
-    <None Include="Views\Home\About.cshtml" />
-    <None Include="Views\Home\Contact.cshtml" />
-    <None Include="Views\Home\Index.cshtml" />
     <None Include="Views\Order\Error.cshtml" />
     <None Include="Views\Order\ListOrdered.cshtml" />
     <None Include="Views\Order\Mail.cshtml" />
@@ -87,7 +84,7 @@
     <None Include="Views\Staff\InsertBasic.cshtml" />
     <None Include="Views\Staff\ListOrder.cshtml" />
     <None Include="Views\Staff\ListProduct.cshtml" />
-    <None Include="Views\Staff\LoginStaff.cshtml" />
+    <None Include="Views\LoginStaff\LoginStaff.cshtml" />
     <None Include="Views\Staff\OrderDetails.cshtml" />
     <None Include="Views\Staff\RegisterStaff.cshtml" />
     <None Include="Views\Staff\ReturnProduct.cshtml" />
@@ -100,7 +97,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
-    <Folder Include="Models\" />
     <Folder Include="Reports\" />
   </ItemGroup>
   <ItemGroup>

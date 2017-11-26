@@ -293,7 +293,9 @@ namespace Mugi.Service.Services
         {
             return UnitOfWork.OrderRepository
                 .Get(x => x.Status == "Completed" && x.ConfirmDate >= StartTime 
-                && x.ConfirmDate <= EndTime, includeProperties: "OrderProducts,OrderSubProducts").ToList();
+                && x.ConfirmDate <= EndTime, 
+                includeProperties: "OrderProducts,OrderProducts.Product" +
+                ",OrderSubProducts,OrderSubProducts.SubProduct").ToList();
         }
     }
 }

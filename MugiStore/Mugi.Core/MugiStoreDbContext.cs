@@ -38,14 +38,13 @@ namespace Mugi.Core
         public DbSet<PropertyDetailsSubProduct> PropertyDetailsSubProducts { get; set; }
         public DbSet<PropertyProducts> PropertyProducts { get; set; }
         public DbSet<OrderSubProduct> OrderSubProducts { get; set; }
-        //public DbSet<RoleAccount> RoleAccounts { get; set; }
         public DbSet<GoodsReceiptSubProduct> GoodsReceiptSubProducts { get; set; }
         public DbSet<ReturnProductSubProduct> ReturnProductSubProducts { get; set; }
         public DbSet<GoodsReceiptProduct> GoodsReceiptProducts { get; set; }
         public DbSet<OrderProduct> OrderProducts { get; set; }
-        public DbSet<ShopOrder> ShopOrders { get; set; }
-        public DbSet<ShopOrderProduct> ShopOrderProducts { get; set; }
-        public DbSet<ShopOrderSubProduct> ShopOrderSubProducts { get; set; }
+        //public DbSet<ShopOrder> ShopOrders { get; set; }
+        //public DbSet<ShopOrderProduct> ShopOrderProducts { get; set; }
+        //public DbSet<ShopOrderSubProduct> ShopOrderSubProducts { get; set; }
 
 
         public virtual void Commit()
@@ -81,14 +80,13 @@ namespace Mugi.Core
             new PropertyDetailsSubProductsConfiguration(modelBuilder.Entity<PropertyDetailsSubProduct>());
             new PropertyProductsConfiguration(modelBuilder.Entity<PropertyProducts>());
             new OrderSubProductConfiguration(modelBuilder.Entity<OrderSubProduct>());
-            //new RoleAccountConfiguration(modelBuilder.Entity<RoleAccount>());
             new GoodsReceiptSubProductConfiguration(modelBuilder.Entity<GoodsReceiptSubProduct>());
             new ReturnProductSubProductConfiguration(modelBuilder.Entity<ReturnProductSubProduct>());
             new GoodsReceiptProductConfiguration(modelBuilder.Entity<GoodsReceiptProduct>());
             new OrderProductConfiguration(modelBuilder.Entity<OrderProduct>());
-            new ShopOrderConfiguration(modelBuilder.Entity<ShopOrder>());
-            new ShopOrderSubProductConfiguration(modelBuilder.Entity<ShopOrderSubProduct>());
-            new ShopOrderProductConfiguration(modelBuilder.Entity<ShopOrderProduct>());
+            //new ShopOrderConfiguration(modelBuilder.Entity<ShopOrder>());
+            //new ShopOrderSubProductConfiguration(modelBuilder.Entity<ShopOrderSubProduct>());
+            //new ShopOrderProductConfiguration(modelBuilder.Entity<ShopOrderProduct>());
 
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {

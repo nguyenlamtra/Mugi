@@ -99,6 +99,9 @@
                                     <div class="middle aligned content">
                                         <div class="header">
                                             <h4>
+                                                Id: @item.SubProductId
+                                            </h4>
+                                            <h4>
                                                 @item.ProductName
                                             </h4>
 
@@ -126,7 +129,7 @@
 
                         </td>
                         <td class="center aligned priceProduct">
-                            @item.Price
+                            @item.Price.ToString("#,## VNĐ")
                         </td>
                         <td class="center aligned">
                             <div class="ui scrolling dropdown">

@@ -128,7 +128,7 @@
                                 <tr>
                                     <th>Tên mặt hàng</th>
                                     <th>Thuộc tính</th>
-                                    <th>Đơn giá</th>
+                                    <th>Đơn giá (VNĐ)</th>
                                     <th>Số lượng</th>
                                 </tr>
                             </thead>
@@ -144,7 +144,7 @@
                                                 <p>@property.PropertyName : @property.PropertyValue</p>
                                             }
                                         </td>
-                                        <td>@product.Price</td>
+                                        <td>@product.Price.ToString("#,##")</td>
                                         <td>@subItem.NumberSubProduct</td>
                                     </tr>
                                 }
@@ -306,7 +306,7 @@
                 Messages
             </div>
             <div class="content" style="text-align: center">
-                <p>Hóa đơn chưa được giao hoặc đã hoàn tất !</p>
+                <p>Hoàn tất hóa đơn thất bại !</p>
             </div>
             <div class="actions" style="text-align: center">
                 <div class="ui green ok inverted button">
@@ -316,6 +316,40 @@
             </div>
         </div>
         break;
+    case "DeliverFailed":
+        <div class="ui basic modal">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p>Chọn người giao hàng thất bại !</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+        break;
+    case "Failed":
+        <div class="ui basic modal">
+            <div class="ui icon header">
+                <i class="archive icon"></i>
+                Messages
+            </div>
+            <div class="content" style="text-align: center">
+                <p>Từ chối đơn hàng thất bại !</p>
+            </div>
+            <div class="actions" style="text-align: center">
+                <div class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Ok
+                </div>
+            </div>
+        </div>
+    break;
 }
 @section scripts
     {

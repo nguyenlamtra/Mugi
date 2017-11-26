@@ -107,13 +107,13 @@
 
             @await Component.InvokeAsync("Advertisement")
 
-            <div class="ui stackable menu">
+            <div class="ui stackable menu" id="body">
                 <a class="header item" href="/Product/HomePage">
                     <img src="~/images/logo.png">
                 </a>
                 @*<a class="item" href="/Product/AboutUs">
-                    Liên hệ
-                </a>*@
+                        Liên hệ
+                    </a>*@
                 <a class="item" href="/Product/Map">
                     Bản đồ
                 </a>
@@ -154,7 +154,7 @@
 
 
             </div>
-            <div class="ui stackable grid">
+            <div class="ui stackable grid" >
 
 
 
@@ -227,7 +227,9 @@
             autoControls: true
         });
         $(document).ready(function () {
-            
+            $('html, body').animate({
+                scrollTop: $("#body").offset().top
+            }, 500);
 
 
             $('.insert-name').attr('maxlength', '30');
@@ -241,7 +243,7 @@
                 return event.charCode >= 48 && event.charCode <= 57
             })
             $('.insert-mail').attr('maxlength', '40');
-          
+
 
         })
     </script>

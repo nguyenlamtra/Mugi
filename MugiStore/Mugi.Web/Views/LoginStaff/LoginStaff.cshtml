@@ -1,0 +1,57 @@
+﻿@using Mugi.Web.Model.ViewModel
+
+@model LoginCustomerViewModel
+@{
+    ViewData["Title"] = "LoginStaff";
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+}
+
+<style>
+    .error.custom {
+        color: red;
+    }
+    body {
+        background-color: #DADADA;
+    }
+
+        body > .grid {
+            height: 100%;
+        }
+
+    .image {
+        margin-top: -100px;
+    }
+
+    .column {
+        max-width: 450px;
+    }
+</style>
+
+<div class="ui middle aligned center aligned grid">
+    <div class="column">
+            <h1 class="ui header content">
+                Đăng nhập
+            </h1>
+        <form class="ui large form" asp-controller="LoginStaff" asp-action="LoginStaff" method="post">
+            <div class="ui stacked segment">
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input  asp-for="UserName" class="insert-name" placeholder="Tên đăng nhập"><br />
+                    </div>
+                    
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input asp-for="Password" class="insert-name" type="password" placeholder="Mật khẩu"><br />
+                    </div>
+                </div>
+                <button type="submit" class="ui fluid large black submit button">Đăng nhập</button>
+            </div>
+
+                <span asp-validation-for="UserName" class="error custom"></span><br />
+                <span asp-validation-for="Password" class="error custom"></span>
+        </form>
+    </div>
+</div>

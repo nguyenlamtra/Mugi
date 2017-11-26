@@ -169,6 +169,28 @@ namespace Mugi.Core.Infrastructure
             else
                 return query;
         }
+
+        public IEnumerable<TEntity> GetWithTakeAndSkip(int skip, int take,
+            Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, 
+                IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "")
+        {
+            IQueryable<TEntity> query = dbSet;
+
+            if (filter != null)
+                query = query.Where(filter);
+
+            foreach (var includeProperty in includeProperties.Split
+                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty.Trim());
+            }
+
+            if (orderBy != null)
+                return orderBy(query.Skip(skip).Take(take));
+            else
+                return query.Skip(skip).Take(take).ToList();
+                
+        }
         #endregion
     }
 }

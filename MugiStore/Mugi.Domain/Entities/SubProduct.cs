@@ -33,6 +33,6 @@ namespace Mugi.Domain.Entities
 
         public virtual ICollection<GoodsReceiptSubProduct> GoodsReceiptSubProducts { get; set; }
 
-        public virtual ICollection<ShopOrderSubProduct> ShopOrderSubProducts { get; set; }
+        //public virtual ICollection<ShopOrderSubProduct> ShopOrderSubProducts { get; set; }
     }
 }

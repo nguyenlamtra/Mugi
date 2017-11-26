@@ -45,7 +45,12 @@ namespace Mugi.Web.Mappings
             // AddPromotion
             CreateMap<AddPromotionViewModel, Promotion>();
 
-            
+
+            //CreateMap<ShopOrderViewModel, ShopOrder>()
+            //    .ForMember(x => x.SupplierId, map => map.MapFrom(x => x.PriceInput))
+            //    .ForMember(x => x.SupplierId, map => map.MapFrom(x => x.SubProducts))
+            //    .ForMember(x => x.ShopOrderProducts, map => map.MapFrom(x => x.Id));
+
 
 
             //CreateMap<InsertProductViewModel, Product>();

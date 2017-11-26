@@ -40,7 +40,7 @@ namespace Mugi.Domain.Entities
 
         public DateTime CreatedDate { get; set; }
 
-        public virtual ICollection<ShopOrderProduct> ShopOrderProducts { get; set; }
+        //public virtual ICollection<ShopOrderProduct> ShopOrderProducts { get; set; }
 
         public virtual SubCategory SubCategory { get; set; }
 

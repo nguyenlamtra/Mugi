@@ -12,12 +12,11 @@ namespace Mugi.Domain.Entities
         }
 
         public int StaffId { get; set; }
-        public int ShopOrderId { get; set; }
+        //public int ShopOrderId { get; set; }
         public DateTime CreatedDate { get; set; }
 
-
+        //public virtual ShopOrder ShopOrder { get; set; }
         public virtual Staff Staff { get; set; }
-        public virtual ICollection<ShopOrder> ShopOrders { get; set; }
         public virtual ICollection<GoodsReceiptSubProduct> GoodsReceiptSubProducts { get; set; }
         public virtual ICollection<GoodsReceiptProduct> GoodsReceiptProducts { get; set; }
     }

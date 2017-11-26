@@ -89,18 +89,14 @@
         $(document).ready(function () {
             $('.ui.dropdown').dropdown();
             $('#AddSubProductBtn').on('click', function () {
-                var array = $('.propertyId').dropdown('get value');
-                var result = [];
                 var productId = parseInt($('#ProductId').val());
-                //for (var i = 0; i < array.length; i++) {
-                //    if (array[i] != '') {
-                //        result.push(parseInt(array[i]));
-                //    }
-                //}
-                //result = JSON.stringify({ ProductId: productId, PropertyDetailIds: result });
-
-                result.push(parseInt(array));//
-                result = JSON.stringify({ ProductId: productId, PropertyDetailIds: result });//
+                var $propertyIds = $('.propertyId');
+                var propertyDetailIds=[];
+                for (var i = 0; i < $propertyIds.length; i++) {
+                    var propertyDetailId = $($propertyIds[i]).dropdown('get value');
+                    propertyDetailIds.push(parseInt(propertyDetailId));
+                }
+                var result = JSON.stringify({ ProductId: productId, PropertyDetailIds: propertyDetailIds });//
                 console.log('list id: ' + result);
                 $.ajax({
                     url: "@Url.Action("AddSubProduct","Staff")",

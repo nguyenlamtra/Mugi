@@ -63,6 +63,9 @@ namespace Mugi.Web
             services.AddScoped(typeof(IReturnProductService), typeof(ReturnProductService));
             services.AddScoped(typeof(IPromotionService), typeof(PromotionService));
             services.AddScoped(typeof(IViewRenderService), typeof(ViewRenderService));
+            //services.AddScoped(typeof(IShopOrderService), typeof(ShopOrderService));
+            services.AddScoped(typeof(IGoodsReceiptProductService), typeof(GoodsReceiptProductService));
+            services.AddScoped(typeof(IGoodsReceiptSubProductService), typeof(GoodsReceiptSubProductService));
 
             //Mappings
             services.AddAutoMapper();

@@ -6,13 +6,13 @@ using System.Text;
 
 namespace Mugi.Domain.Configurations
 {
-    public class ShopOrderConfiguration
-    {
-        public ShopOrderConfiguration(EntityTypeBuilder<ShopOrder> entityBuilder)
-        {
-            entityBuilder.HasKey(e => e.Id);
-            //entityBuilder.HasOne<Staff>().WithMany(x => x.DeliverOrders).HasForeignKey(x => x.DeliverId);
-            //entityBuilder.HasOne<Staff>().WithMany(x => x.DeliverOrders).HasForeignKey(x => x.DeliverId);
-        }
-    }
+    //public class ShopOrderConfiguration
+    //{
+    //    public ShopOrderConfiguration(EntityTypeBuilder<ShopOrder> entityBuilder)
+    //    {
+    //        entityBuilder.HasKey(e => e.Id);
+    //        //entityBuilder.HasOne<Staff>().WithMany(x => x.DeliverOrders).HasForeignKey(x => x.DeliverId);
+    //        //entityBuilder.HasOne<Staff>().WithMany(x => x.DeliverOrders).HasForeignKey(x => x.DeliverId);
+    //    }
+    //}
 }

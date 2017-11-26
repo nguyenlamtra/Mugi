@@ -73,7 +73,7 @@
                             <th>STT</th>
                             <th>Tên mặt hàng</th>
                             <th>Thuộc tính</th>
-                            <th>Đơn giá</th>
+                            <th>Đơn giá (VNĐ)</th>
                             <th>Số lượng</th>
                         </tr>
                     </thead>
@@ -91,7 +91,7 @@
                                         <p>@property.PropertyName : @property.PropertyValue</p>
                                     }
                                 </td>
-                                <td>@product.Price</td>
+                                <td>@product.Price.ToString("#,##")</td>
                                 <td>@subItem.NumberSubProduct</td>
                             </tr>
                             j++;

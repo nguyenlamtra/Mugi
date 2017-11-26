@@ -58,7 +58,7 @@
 
 @*Main Home Page*@
 
-<div class="twelve wide column">
+<div class="twelve wide column"  id="home-page">
 
     @*Popup Producer Filter*@
     <div>
@@ -144,7 +144,7 @@
                 </div>
             </div>
 
-            <div id="partialview">
+            <div id="partialview" style="height:960px;">
                 @{Html.RenderPartial("_Product", Model.ProductModels);}
             </div>
         </div>
@@ -152,7 +152,6 @@
 
 </div>
 @section scripts {
-
     <script>
 
     function ajaxFilter(pageNumber) {

@@ -22,7 +22,7 @@
                 <th>STT</th>
                 <th>Hình ảnh</th>
                 <th>Tên mặt hàng</th>
-                <th>Đơn giá</th>
+                <th>Đơn giá (VNĐ)</th>
                 <th>Số lượng</th>
                 <th>Thuộc tính</th>
             </tr>
@@ -35,7 +35,7 @@
                     <td>@i</td>
                     <td>@item.ImageUrl</td>
                     <td>@item.ProductName</td>
-                    <td>@item.Price</td>
+                    <td>@item.Price.ToString("#,##")</td>
                     <td>@item.ProductOrder</td>
                     <td>
                         @foreach (var propertyDetails in item.PropertyDetails)

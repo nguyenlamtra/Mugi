@@ -1,0 +1,103 @@
+﻿@using Mugi.Web.Model
+@model List<ProductForGoodsReceiptModel>
+@{
+    ViewData["Title"] = "ChildShopOrder";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+<div class="twelve wide column">
+    <form asp-controller="Staff" asp-action="SaveShopOrder">
+
+        <div class="ui stackable grid">
+            <div class="sixteen wide column">
+                <table class="ui celled table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            @for (int i = 0; i < Model.Max(x => x.Properties.Count); i++)
+                            {
+                                <th></th>
+                            }
+                            <th width="15%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ var products = Model;}
+                        @for (int k = 0; k < products.Count; k++)
+                        {
+
+                            <tr style="background: black;color: white;">
+                                <td>
+                                    <input type="hidden" name="[@k].Id" value="@products[k].Id"/>
+                                    
+                                    @products[k].ProductName
+                                </td>
+                                @for (int j = 0; j < Model.Max(x => x.Properties.Count); j++)
+                                {
+                                    if (j < products[k].Properties.Count)
+                                    {
+                                        <td>@products[k].Properties[j].PropertyName</td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                    }
+
+                                }
+                                <td>Số lượng</td>
+                            </tr>
+                            @for (int i = 0; i < products[k].SubProducts.Count; i++)
+                            {
+                                <tr>
+                                    @if (i == 0)
+                                    {
+                                        <td><input name="[@k].PriceInput" type="number" /></td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                    }
+                                    @for (int j = 0; j < Model.Max(x => x.Properties.Count); j++)
+                                    {
+                                        if (j < products[k].Properties.Count)
+                                        {
+                                            <td>
+                                                @(products[k].SubProducts[i].PropertyDetails
+                                                .Where(x => x.Property.Id == products[k].Properties[j].Id)
+                                                .SingleOrDefault().PropertyValue)
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                    }
+                                    <td>
+                                        
+                                        <div class="ui input">
+                                        <input name="[@k].SubProducts[@i].Id" type="hidden" value="@products[k].SubProducts[i].Id" />
+                                            <input name="[@k].SubProducts[@i].NumberProduct" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="sixteen wide column" style="text-align:center;">
+                <button type="submit" class="ui button">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('.remove-button').on('click', function () {
+                $(this).parents('tr').remove();
+            })
+        })
+    </script>
+}

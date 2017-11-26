@@ -17,6 +17,7 @@ namespace Mugi.Service.Services
         IEnumerable<SubProduct> GetProductByListSubProductId(int[] subProductId);
         int CheckBeforeCheckout(int[] subProductId);
         SubProduct GetById(int id);
+        IEnumerable<SubProduct> GetForShopOrder(int[] productIds);
     }
 
     public class SubProductService : ISubProductService
@@ -93,13 +94,13 @@ namespace Mugi.Service.Services
         public IEnumerable<SubProduct> GetProductByListSubProductId(int[] subProductId)
         {
             return this.UnitOfWork.SubProductRepository
-                .GetDistinctNoTracking(x => subProductId.Contains(x.Id), 
+                .GetDistinctNoTracking(x => subProductId.Contains(x.Id),
                 includeProperties: "Product,Product.PriceDetails");
         }
-        
+
         public int CheckBeforeCheckout(int[] subProductId)
         {
-            foreach( var i in subProductId)
+            foreach (var i in subProductId)
             {
                 var subProduct = this.UnitOfWork.SubProductRepository.GetWithNoTracking(x => x.Id == i).SingleOrDefault();
                 if (subProduct != null)
@@ -119,7 +120,12 @@ namespace Mugi.Service.Services
 
         public SubProduct GetById(int id)
         {
-            return this.UnitOfWork.SubProductRepository.GetWithNoTracking(x=>x.Id==id,includeProperties:"Product").SingleOrDefault();
+            return this.UnitOfWork.SubProductRepository.GetWithNoTracking(x => x.Id == id, includeProperties: "Product").SingleOrDefault();
+        }
+
+        public IEnumerable<SubProduct> GetForShopOrder(int[] productIds)
+        {
+            return this.UnitOfWork.SubProductRepository.Get(x => productIds.Contains(x.Id), includeProperties: "PropertyDetailsSubProducts, PropertyDetailsSubProducts.PropertyDetails,Product,PropertyDetailsSubProducts.PropertyDetails.Property");
         }
     }
 }

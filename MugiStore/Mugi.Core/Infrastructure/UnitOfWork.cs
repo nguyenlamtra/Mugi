@@ -28,6 +28,33 @@ namespace Mugi.Core.Infrastructure
         private IRepository<ReturnProduct> returnProductRepository;
         private IRepository<Promotion> promotionRepository;
         private IRepository<Role> roleRepository;
+        //private IRepository<ShopOrder> shopOrderRepository;
+        private IRepository<GoodsReceiptProduct> goodsReceiptProductRepository;
+        private IRepository<GoodsReceiptSubProduct> goodsReceiptSubProductRepository;
+
+        public IRepository<GoodsReceiptSubProduct> GoodsReceiptSubProductRepository
+        {
+            get
+            {
+                return goodsReceiptSubProductRepository = goodsReceiptSubProductRepository ?? new Repository<GoodsReceiptSubProduct>(dbContext);
+            }
+        }
+
+        public IRepository<GoodsReceiptProduct> GoodsReceiptProductRepository
+        {
+            get
+            {
+                return goodsReceiptProductRepository = goodsReceiptProductRepository ?? new Repository<GoodsReceiptProduct>(dbContext);
+            }
+        }
+
+        //public IRepository<ShopOrder> ShopOrderRepository
+        //{
+        //    get
+        //    {
+        //        return shopOrderRepository = shopOrderRepository ?? new Repository<ShopOrder>(dbContext);
+        //    }
+        //}
 
         public IRepository<Role> RoleRepository
         {

@@ -208,6 +208,17 @@ namespace Mugi.Web.Mappings
 
             CreateMap<SubCategory, SubCategoryInAddSubCategoryView>();
 
+            CreateMap<Product, BasicProductModel>();
+
+            ////CreateMap<SubProduct, ShopOrderViewModel>()
+            ////    .ForMember(x => x.SubProductId, map => map.MapFrom(x => x.Id))
+            ////    .ForMember(x => x.PropertyValues, map => map.MapFrom(x => x.PropertyDetailsSubProducts))
+            ////    .ForMember(x => x.ProductName, map => map.MapFrom(x => x.Product.ProductName));
+
+            ////CreateMap<PropertyDetailsSubProduct, PropertyShopOrderViewModel>()
+            ////    .ForMember(x => x.PropertyName, map => map.MapFrom(x => x.PropertyDetails.Property.PropertyName))
+            ////    .ForMember(x => x.PropertyValue, map => map.MapFrom(x => x.PropertyDetails.PropertyValue));
+
             //CreateMap<Product, ProductDetailsViewModel>()
             //    .ForMember(x => x.ImageProducts, map => map.MapFrom(x => x.ImageProducts
             //    .OrderByDescending(y => y.Id).Select(y => y.Url)))

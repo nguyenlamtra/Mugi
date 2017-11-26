@@ -22,10 +22,13 @@ namespace Mugi.Core.Infrastructure
         IRepository<Property> PropertyRepository { get; }
         IRepository<PropertyDetails> PropertyDetailsRepository { get; }
         IRepository<GoodsReceipt> GoodsReceiptRepository { get; }
+        IRepository<GoodsReceiptProduct> GoodsReceiptProductRepository { get; }
+        IRepository<GoodsReceiptSubProduct> GoodsReceiptSubProductRepository { get; }
         IRepository<Staff> StaffRepository { get; }
         IRepository<ReturnProduct> ReturnProductRepository { get; }
         IRepository<Promotion> PromotionRepository { get; }
         IRepository<Role> RoleRepository { get; }
+        //IRepository<ShopOrder> ShopOrderRepository { get; }
 
         void Save();
     }

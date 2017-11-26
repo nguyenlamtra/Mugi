@@ -16,7 +16,7 @@
             <tr>
                 <th class="center aligned">Tên sản phẩm</th>
                 <th class="center aligned">Số lượng</th>
-                <th class="center aligned">Đơn giá</th>
+                <th class="center aligned">Đơn giá (VNĐ)</th>
                 <th class="center aligned">Thành tiền</th>
             </tr>
         </thead>
@@ -38,7 +38,7 @@
                 <tr>
                     <td class="center aligned">@item.ProductName</td>
                     <td class="center aligned">@item.ProductOrder</td>
-                    <td class="center aligned">@price</td>
+                    <td class="center aligned">@price.ToString("#,##")</td>
                     <td class="center aligned">@sum</td>
                 </tr>
             }
@@ -48,7 +48,7 @@
             <tr>
                 <td class="center align" colspan="4">
                     <div class="container center aligned header">
-                        <h3 class="header" style="text-align:center">Tổng tiền: @Model.Total</h3>
+                        <h3 class="header" style="text-align:center">Tổng tiền: @Model.Total.ToString("#,## VNĐ")</h3>
                     </div>
                 </td>
             </tr>

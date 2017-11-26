@@ -16,27 +16,6 @@ namespace Mugi.Web.Controllers
             this.categoryService = categoryService;
         }
 
-        public IActionResult Index()
-        {
-            //var testData = categoryService.GetAllCategories().FirstOrDefault().CategoryName;
-            //return Content(testData);
-            return View();
-        }
-
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
         public IActionResult Error()
         {
             return View();

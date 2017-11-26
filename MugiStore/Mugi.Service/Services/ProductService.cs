@@ -32,6 +32,9 @@ namespace Mugi.Service.Services
         Product GetProductForAddImageView(int productId);
         IEnumerable<Product> GetAll();
         string GetProductNameWithNoTracking(int productId);
+
+        IEnumerable<Product> GetAllProductShopOrder(int supplierId);
+        IEnumerable<Product> GetForShopOrder(int[] productIds);
     }
     public class ProductService : IProductService
     {
@@ -140,7 +143,7 @@ namespace Mugi.Service.Services
 
         public IEnumerable<Product> GetAllProductsBySupplierId(int supplierId)
         {
-            return UnitOfWork.ProductRepository.Get(x => x.Supplier.Id == supplierId).ToList();
+            return UnitOfWork.ProductRepository.Get(x => x.Supplier.Id == supplierId && !x.IsDeleted).ToList();
         }
 
         public IEnumerable<Product> GetAllProductsBySupplierIds(int[] supplierIds)
@@ -280,6 +283,20 @@ namespace Mugi.Service.Services
         public string GetProductNameWithNoTracking(int productId)
         {
             return this.UnitOfWork.ProductRepository.GetWithNoTracking(x => x.Id == productId).SingleOrDefault().ProductName;
+        }
+
+        public IEnumerable<Product> GetAllProductShopOrder(int supplierId)
+        {
+            return this.UnitOfWork.ProductRepository.Get(x => x.SupplierId == supplierId);
+        }
+
+        public IEnumerable<Product> GetForShopOrder(int[] productIds)
+        {
+            return this.UnitOfWork.ProductRepository
+                .Get(x => productIds.Contains(x.Id), 
+                includeProperties: "SubProducts, SubProducts.PropertyDetailsSubProducts, " +
+                "SubProducts.PropertyDetailsSubProducts.PropertyDetails, " +
+                "PropertyProducts, PropertyProducts.Property");
         }
     }
 }

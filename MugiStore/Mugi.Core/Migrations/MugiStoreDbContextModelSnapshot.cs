@@ -138,6 +138,8 @@ namespace Mugi.Core.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ShopOrderId");
+
                     b.HasIndex("StaffId");
 
                     b.ToTable("GoodsReceipts");
@@ -484,15 +486,11 @@ namespace Mugi.Core.Migrations
 
                     b.Property<DateTime>("CreateDate");
 
-                    b.Property<int>("GoodsReceiptId");
-
                     b.Property<bool>("IsDeleted");
 
                     b.Property<int>("SupplierId");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GoodsReceiptId");
 
                     b.HasIndex("SupplierId");
 
@@ -504,6 +502,8 @@ namespace Mugi.Core.Migrations
                     b.Property<int>("ProductId");
 
                     b.Property<int>("ShopOrderId");
+
+                    b.Property<decimal>("PriceInput");
 
                     b.HasKey("ProductId", "ShopOrderId");
 
@@ -638,6 +638,11 @@ namespace Mugi.Core.Migrations
 
             modelBuilder.Entity("Mugi.Domain.Entities.GoodsReceipt", b =>
                 {
+                    b.HasOne("Mugi.Domain.Entities.ShopOrder", "ShopOrder")
+                        .WithMany("GoodsReceipts")
+                        .HasForeignKey("ShopOrderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Mugi.Domain.Entities.Staff", "Staff")
                         .WithMany("GoodsReceipts")
                         .HasForeignKey("StaffId")
@@ -831,11 +836,6 @@ namespace Mugi.Core.Migrations
 
             modelBuilder.Entity("Mugi.Domain.Entities.ShopOrder", b =>
                 {
-                    b.HasOne("Mugi.Domain.Entities.GoodsReceipt", "GoodsReceipt")
-                        .WithMany("ShopOrders")
-                        .HasForeignKey("GoodsReceiptId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Mugi.Domain.Entities.Supplier", "Supplier")
                         .WithMany("ShopOrders")
                         .HasForeignKey("SupplierId")

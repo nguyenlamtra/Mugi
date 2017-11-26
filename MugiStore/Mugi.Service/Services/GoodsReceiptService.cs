@@ -10,8 +10,10 @@ namespace Mugi.Service.Services
     public interface IGoodsReceiptService
     {
         bool Add(GoodsReceipt goodsReceipt, List<PriceDetails> priceDetails, int staffId);
+        IEnumerable<GoodsReceipt> GetAll();
+        GoodsReceipt GetWithSkipTakeStatistical(int skip, int take);
     }
-    public class GoodsReceiptService:IGoodsReceiptService
+    public class GoodsReceiptService : IGoodsReceiptService
     {
         private IUnitOfWork UnitOfWork { get; set; }
 
@@ -26,11 +28,11 @@ namespace Mugi.Service.Services
             {
                 goodsReceipt.CreatedDate = DateTime.Now;
                 goodsReceipt.StaffId = staffId;
-                foreach(var item in priceDetails)
+                foreach (var item in priceDetails)
                 {
                     this.UnitOfWork.PriceDetailsRepository.Add(item);
                 }
-                foreach(var item in goodsReceipt.GoodsReceiptSubProducts)
+                foreach (var item in goodsReceipt.GoodsReceiptSubProducts)
                 {
                     var subProduct = this.UnitOfWork.SubProductRepository.GetById(item.SubProductId);
                     subProduct.ProductLeft += item.Quantity;
@@ -40,11 +42,25 @@ namespace Mugi.Service.Services
 
                 this.UnitOfWork.Save();
                 return true;
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
                 return false;
             }
+        }
+
+        public IEnumerable<GoodsReceipt> GetAll()
+        {
+            return UnitOfWork.GoodsReceiptRepository
+                .Get(includeProperties: "GoodsReceiptSubProducts,GoodsReceiptProducts,GoodsReceiptSubProducts.SubProduct");
+        }
+
+        public GoodsReceipt GetWithSkipTakeStatistical(int skip, int take)
+        {
+            return UnitOfWork.GoodsReceiptRepository
+                .GetWithTakeAndSkip(skip, take, includeProperties:
+                "GoodsReceiptSubProducts,GoodsReceiptProducts,GoodsReceiptSubProducts.SubProduct").FirstOrDefault();
         }
     }
 }

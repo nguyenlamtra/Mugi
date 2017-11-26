@@ -1,0 +1,185 @@
+﻿@using Mugi.Web.Model
+@model IList<SupplierModel>
+@{
+    ViewData["Title"] = "ShopOrder";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+<style>
+    .ui.segment.custom {
+        min-height: 75vh;
+    }
+
+    .ui.container.scroll {
+        overflow-y: scroll;
+        max-height: 60vh;
+    }
+
+    table.ui.basic.table {
+        height: 100px;
+    }
+
+    input {
+        max-width: none;
+    }
+
+    .error {
+        color: red;
+    }
+
+    .product-item:hover {
+        cursor: pointer;
+    }
+
+    .close-button:hover {
+        cursor: pointer !important;
+    }
+</style>
+<div class="twelve wide column">
+    <div class="ui stackable grid">
+        <div class="eight wide column">
+            <div class="ui segment custom">
+                <div class="item">
+                    <div class="ui fluid selection dropdown" id="supplier-dropdown">
+                        <input type="hidden" name="user">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">Select Friend</div>
+                        <div class="menu">
+                            @{ var suppliers = ViewBag.Suppliers as IEnumerable<SupplierModel>;}
+                            @foreach (var item in suppliers)
+                            {
+                                <div class="item" data-value="@item.Id">
+                                    
+                                    @item.SupplierName
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="ui container">
+                    <div class="ui container scroll" style="margin-top: 10px;">
+                        <table class="ui celled table">
+                            <thead>
+                                <tr class="ui center aligned ">
+                                    <th>
+                                        Id
+                                    </th>
+                                    <th>
+                                        Tên sản phẩm
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="product-of-supplier"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="eight wide column">
+            <form asp-controller="Staff" asp-action="ShopOrder" >
+
+                <div class="ui segment custom">
+                    <div class="ui container scroll" style="margin-top: 10px;">
+                        <table class="ui celled table">
+                            <thead>
+                                <tr class="ui center aligned ">
+                                    <th>
+                                        #
+                                    </th>
+                                    <th>
+                                        Tên sản phẩm
+                                    </th>
+                                    <th width="5%">
+
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="selected-product"></tbody>
+                        </table>
+                       
+                    </div>
+                   
+                </div>
+                <div class="sixteen wide column center aligned" style="text-align: center;">
+                    <button type="submit" id="submit" class="ui button">Submit</button>
+                </div>
+            </form>
+            
+        </div>
+
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('#supplier-dropdown').dropdown();
+
+            $('#supplier-dropdown').dropdown({
+                onChange: function (value, text, $choice) {
+                    $('#selected-product').empty();
+                    $('#product-of-supplier').empty();
+
+                    getProductBySupplierId(value);
+                }
+            })
+
+            $(document).on('click', '.product-item', function () {
+                $('.product-item').each(function () {
+                    $(this).removeClass('active');
+                })
+                $(this).addClass('active');
+                var id = parseInt($(this).find('.id').data('id'));
+                if (checkId($('.submit-product'), id)) {
+                    var name = $(this).find('.name').text();
+                    $('#selected-product').append('<tr><td class="submit-product" data-id="' + id + '"><input type="hidden" name="[' + getHightestArray() + ']" value="'+id+'" class="selectedProduct"/>' + id + '</td><td>' + name + '</td><td><i class="close-button window close icon"></i></td></tr>');
+                }
+            })
+
+            $(document).on('click', '.close-button', function () {
+                $(this).parents('tr').remove();
+                updateArrayInputSubmit();
+            })
+        })
+
+        function getHightestArray()
+        {
+            var $inputs = $('.selectedProduct');
+            return $inputs.length;
+        }
+
+        function updateArrayInputSubmit()
+        {
+            var $inputs = $('.selectedProduct');
+            for (var i = 0; i < $inputs.length; i++) {
+                $inputs[i].name = '[' + i + ']';
+                $inputs[i].id = '[' + i + ']';
+            }
+        }
+
+        function checkId($ids, value) {
+            console.log($($ids).length);
+            for (var i = 0; i < $ids.length; i++) {
+                if ($($ids[i]).data('id') == value)
+                    return false;
+            }
+            return true;
+        }
+        function getProductBySupplierId(supplierId) {
+            $.ajax({
+                url: '/Staff/GetProductBySupplierId',
+                data: { "supplierId": supplierId },
+                type: 'post',
+                success: function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        $('#product-of-supplier').append('<tr class="product-item"><td class="id" data-id="' + data[i].id + '">' + data[i].id + '</td><td class="name">' + data[i].productName + '</td></tr>');
+                    }
+                    console.log(data);
+                },
+                error: function () {
+                    console.log('error');
+                }
+
+            })
+
+        }
+    </script>
+}

@@ -50,7 +50,7 @@
                                             Tên sản phẩm
                                         </th>
                                         <th>
-                                            Giá
+                                            Giá (VNĐ)
                                         </th>
 
                                     </tr>
@@ -63,7 +63,7 @@
                                                 @item.ProductName
                                             </td>
                                             <td>
-                                                @item.Price
+                                                @item.Price.ToString("#,##")
                                             </td>
                                         </tr>
                                     }

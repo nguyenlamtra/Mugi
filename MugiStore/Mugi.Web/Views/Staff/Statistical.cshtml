@@ -1,4 +1,5 @@
-﻿@model Mugi.Web.Model.ViewModel.StatisticalViewModel
+﻿@using Mugi.Web.Model;
+@model StatisticalModel
 @{
     ViewData["Title"] = "Statistical";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
@@ -12,50 +13,58 @@
         </div>
         <div class="sixteen wide column" style="text-align:center;">
             <form asp-action="Statistical" asp-controller="Staff" method="post">
-                    <div class="ui form">
-                        <div class="two fields">
-                            <div class="field">
-                                <div class="ui calendar" id="rangestart">
-                                    <div class="ui input left icon">
-                                        <i class="calendar icon"></i>
-                                        <input type="text" asp-for="StatisticalModel.StartDate" placeholder="Ngày bắt đầu">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="field">
-                                <div class="ui calendar" id="rangeend">
-                                    <div class="ui input left icon">
-                                        <i class="calendar icon"></i>
-                                        <input type="text" asp-for="StatisticalModel.EndDate" placeholder="Ngày kết thúc">
-                                    </div>
+                <div class="ui form">
+                    <div class="two fields">
+                        <div class="field">
+                            <div class="ui calendar" id="rangestart">
+                                <div class="ui input left icon">
+                                    <i class="calendar icon"></i>
+                                    <input type="text" asp-for="StartDate" placeholder="Ngày bắt đầu">
                                 </div>
                             </div>
                         </div>
-                      
                         <div class="field">
-                            <button type="submit" class="ui button">Submit</button>
+                            <div class="ui calendar" id="rangeend">
+                                <div class="ui input left icon">
+                                    <i class="calendar icon"></i>
+                                    <input type="text" asp-for="EndDate" placeholder="Ngày kết thúc">
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="field">
+                        <button type="submit" class="ui button">Submit</button>
+                    </div>
+                </div>
             </form>
         </div>
         <div class="sixteen wide column" style="text-align:center;">
-            <table class="ui very basic collapsing celled table">
+            <table class="ui celled table">
                 <thead>
                     <tr>
-                        <th>Ngày thanh toán hóa đơn</th>
-                        <th>Tổng tiền thanh toán</th>
-                       
+                        <th>Mã sản phẩm</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Tổng bán (VNĐ)</th>
+                        <th>Tổng chi (VNĐ)</th>
+                        <th>Lợi nhuận (VNĐ)</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if (Model != null)
+                    @{
+                        var table = ViewBag.Table as IEnumerable<StatisticalTableModel>;
+                    }
+                    @if (table != null)
                     {
-                        foreach (var order in Model.StatisticalTableModel.Orders)
+                        foreach (var row in table)
                         {
                             <tr>
-                                <td>@order.ConfirmDate</td>
-                                <td>@order.Total</td>
-                                
+                                <td>@row.ProductId</td>
+                                <td>@row.ProductName</td>
+                                <td>@row.TotalSell.ToString("#,##")</td>
+                                <td>@row.TotalPay.ToString("#,##")</td>
+                                @{var temp = row.TotalSell - row.TotalPay;}
+                                <td>@temp.ToString("#,##")</td>
                             </tr>
                         }
                     }
@@ -64,11 +73,10 @@
         </div>
     </div>
 </div>
-
 @section scripts{
     <script>
         $(document).ready(function () {
-            
+
             $('#rangestart').calendar({
                 type: 'date',
                 endCalendar: $('#rangeend')
@@ -84,6 +92,5 @@
 
     </script>
 }
-
 
 

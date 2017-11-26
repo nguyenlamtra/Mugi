@@ -80,7 +80,7 @@
                         <div class="item " style="text-align:center">
                             <div class="ui mini statistic">
                                 <div class="value">
-                                    @Model.ProductModel.PriceDetails.Price
+                                    @Model.ProductModel.PriceDetails.Price.ToString("#,##")
                                 </div>
                                 <div class="label">
                                     VND
@@ -277,10 +277,14 @@
 
     $('#addCart').on('click', function () {
         var propertyValues = [];
-        var t = $('.ui.dropdown.propertyDetails').dropdown('get value');
-        for (var a = 0; a < t.length; a++) {
-            if (t[a] != '') propertyValues.push(parseInt(t));
-
+        //var t = $('.ui.dropdown.propertyDetails').dropdown('get value');
+        //for (var a = 0; a < t.length; a++) {
+        //    if (t[a] != '') propertyValues.push(parseInt(t[a]));
+        //}
+        var $dropdowns = $('.ui.dropdown.propertyDetails');
+        for (var i = 0; i < $dropdowns.length; i++) {
+            var value = $($dropdowns[i]).dropdown('get value')
+            propertyValues.push(parseInt(value));
         }
         var productId = $('#productId').data('value');
         var filter = { propertyDetailsIds: propertyValues, ProductId: productId };

@@ -21,9 +21,11 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using COmpStoreClient.Filters;
 
 namespace Mugi.Web.Controllers
 {
+    [ValidateAdmin]
     public class StaffController : Controller
     {
         private IMapper Mapper;
@@ -38,11 +40,14 @@ namespace Mugi.Web.Controllers
         private ICategoryService CategoryService;
         private IAdvertisementService AdvertisementService;
         private IGoodsReceiptService GoodsReceiptService;
+        private IGoodsReceiptProductService GoodsReceiptProductService;
         private IStaffServie StaffService;
         private IAccountService AccountService;
         private IOrderService OrderService;
         private IReturnProductService ReturnProductService;
         private IPromotionService PromotionService;
+        //private IShopOrderService ShopOrderService;
+        private IGoodsReceiptSubProductService GoodsReceiptSubProductService;
 
         public StaffController(
             IMapper mapper,
@@ -63,7 +68,10 @@ namespace Mugi.Web.Controllers
             IAccountService accountService,
             IOrderService orderService,
             IReturnProductService returnProductService,
-            IPromotionService promotionService)
+            IPromotionService promotionService,
+            //IShopOrderService shopOrderService,
+            IGoodsReceiptProductService goodsReceiptProductService,
+            IGoodsReceiptSubProductService goodsReceiptSubProductService)
         {
             this.Mapper = mapper;
             this.SupplierService = supplierService;
@@ -82,28 +90,24 @@ namespace Mugi.Web.Controllers
             this.OrderService = orderService;
             this.ReturnProductService = returnProductService;
             this.PromotionService = promotionService;
-
+            //this.ShopOrderService = shopOrderService;
+            this.GoodsReceiptProductService = goodsReceiptProductService;
+            this.GoodsReceiptSubProductService = goodsReceiptSubProductService;
         }
 
 
         public IActionResult Index()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
             return View();
         }
 
         public IActionResult HandleOrder()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
             return View();
         }
 
         public IActionResult GetReport()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
             return View();
         }
 
@@ -111,8 +115,6 @@ namespace Mugi.Web.Controllers
 
         public IActionResult UpdateProduct(int productId)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
             var suppliers = this.SupplierService.GetAll();
             var product = this.ProductService.GetForUpdateProduct(productId);
             var subCategories = this.SubCategoriesService.GetAll();
@@ -160,8 +162,6 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public IActionResult UpdateProduct(UpdateProductViewModel viewModel)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
             var suppliers = this.SupplierService.GetAll();
             var temp = this.ProductService.GetForUpdateProduct(viewModel.Id);
             var subCategories = this.SubCategoriesService.GetAll();
@@ -209,8 +209,6 @@ namespace Mugi.Web.Controllers
 
         public IActionResult AddImageProduct(int productId)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
             var images = this.ImageProductService.GetImageProductByProductId(productId);
             var product = this.ProductService.GetProductForAddImageView(productId);
             product.ImageProducts = new List<ImageProduct>();
@@ -222,8 +220,6 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddImageProduct(AddImageProductViewModel viewModel)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
             var file = viewModel.Image;
             var filePath = _hostingEnvironment.WebRootPath + "\\images\\ProductImages";
             if (ModelState.IsValid)
@@ -255,8 +251,6 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public IActionResult DeleteImageProduct(int imageId)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
             if (this.ImageProductService.Delete(imageId))
             {
                 return Json("Success");
@@ -269,9 +263,6 @@ namespace Mugi.Web.Controllers
 
         public IActionResult Delete(int productId)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
-            
             if (this.ProductService.Delete(productId))
             {
                 TempData["ListProduct"] = "Success";
@@ -285,8 +276,6 @@ namespace Mugi.Web.Controllers
 
         public IActionResult AddSubProduct(int productId)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
             var product = this.ProductService.GetForAddSubProductView(productId);
             var viewModel = Mapper.Map<Product, AddSubProductViewModel>(product);
             return View(viewModel);
@@ -295,8 +284,6 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public IActionResult AddSubProduct([FromBody] AddProductModel model)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
             var product = this.ProductService.GetForAddSubProductView(model.ProductId);
             var temp = Mapper.Map<Product, AddSubProductViewModel>(product);
             List<ErrorModel> errors = new List<ErrorModel>();
@@ -334,8 +321,6 @@ namespace Mugi.Web.Controllers
 
         public IActionResult ListProduct()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
             var listProduct = this.ProductService.GetForListProductView();
             var listProductView = Mapper.Map<IEnumerable<Product>, IEnumerable<ListProductViewModel>>(listProduct);
             return View(listProductView);
@@ -343,8 +328,6 @@ namespace Mugi.Web.Controllers
 
         public IActionResult AddProduct()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
             return View(new InsertProductViewModel(GetSubCategories(), GetProperies(), GetSuppliers()));
         }
 
@@ -367,8 +350,8 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddProduct(InsertProductViewModel insertProductViewModel)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             if (ModelState.IsValid)
             {
                 var file = insertProductViewModel.Image;
@@ -400,8 +383,8 @@ namespace Mugi.Web.Controllers
 
         public IActionResult SearchProduct(string name)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             var products = this.ProductService.GetForSearch(name);
             var searchResult = Mapper.Map<IEnumerable<Product>, IEnumerable<SearchModel>>(products);
             return Json(new { results = searchResult });
@@ -409,8 +392,8 @@ namespace Mugi.Web.Controllers
 
         public IActionResult GoodsReceiptSearch(string name)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             var products = this.ProductService.GetForSearch(name);
             var searchResult = Mapper.Map<IEnumerable<Product>, IEnumerable<SearchGoodsReceiptModel>>(products);
             return Json(new { results = searchResult });
@@ -419,8 +402,8 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public IActionResult GoodsReceiptProduct(int productId)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             var product = this.ProductService.GetForGoodsReceipt(productId);
             var result = Mapper.Map<Product, ProductForGoodsReceiptModel>(product);
             return PartialView("_GoodsReceipt", result);
@@ -428,8 +411,8 @@ namespace Mugi.Web.Controllers
 
         public IActionResult AddCategory()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             var categories = this.CategoryService.GetAllCategories();
             AddCategoryViewModel viewModel = new AddCategoryViewModel();
             viewModel.Categories = Mapper.Map<IEnumerable<Category>, IEnumerable<BasicProperty>>(categories).ToList();
@@ -438,8 +421,8 @@ namespace Mugi.Web.Controllers
 
         public IActionResult GetDescriptionCategory(int categoryId)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             string description = this.CategoryService.GetDescription(categoryId);
             return Json(description);
         }
@@ -447,8 +430,8 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public IActionResult AddOrUpdateCategory([FromBody] AddCategoryViewModel viewModel)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             if (ModelState.IsValid)
             {
                 var category = Mapper.Map<AddCategoryViewModel, Category>(viewModel);
@@ -470,7 +453,7 @@ namespace Mugi.Web.Controllers
                 }
                 else
                 {
-                    if (this.CategoryService.CheckUpdate(viewModel.CategoryName,viewModel.Id))
+                    if (this.CategoryService.CheckUpdate(viewModel.CategoryName, viewModel.Id))
                     {
                         if (this.CategoryService.Update(category))
                         {
@@ -486,9 +469,9 @@ namespace Mugi.Web.Controllers
                     {
                         return Json(new { status = "UpdateFailed" });
                     }
-                    
+
                 }
-                
+
             }
             else
             {
@@ -500,12 +483,12 @@ namespace Mugi.Web.Controllers
 
         public IActionResult AddSubCategory(int categoryId)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             AddSubCategoryViewModel viewModel = new AddSubCategoryViewModel();
             viewModel.Categories = Mapper.Map<IEnumerable<Category>,
                 IEnumerable<BasicProperty>>(this.CategoryService.GetAllCategories()).ToList();
-            viewModel.SubCategories = Mapper.Map<IEnumerable<SubCategory>, 
+            viewModel.SubCategories = Mapper.Map<IEnumerable<SubCategory>,
                 IEnumerable<SubCategoryInAddSubCategoryView>>(this.SubCategoriesService.GetByCategoryId(categoryId)).ToList();
             viewModel.CategoryId = categoryId;
             return View(viewModel);
@@ -514,7 +497,7 @@ namespace Mugi.Web.Controllers
 
         public IActionResult DeleteSubCategory(int subCategoryId)
         {
-            if(SubCategoriesService.Delete(subCategoryId))
+            if (SubCategoriesService.Delete(subCategoryId))
                 return Json(true);
             else
                 return Json(false);
@@ -538,15 +521,15 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public IActionResult AddOrUpdateSubCategory([FromBody] SubCategoryViewModel viewModel)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             viewModel.SubCategoryName = viewModel.SubCategoryName.Trim();
             if (ModelState.IsValid)
             {
                 var subCategory = Mapper.Map<SubCategoryViewModel, SubCategory>(viewModel);
                 if (viewModel.Id != 0)
                 {
-                    if (this.SubCategoriesService.CheckNameForUpdate(viewModel.SubCategoryName, viewModel.Id ,viewModel.CategoryId))
+                    if (this.SubCategoriesService.CheckNameForUpdate(viewModel.SubCategoryName, viewModel.Id, viewModel.CategoryId))
                     {
                         if (this.SubCategoriesService.Update(subCategory))
                         {
@@ -564,7 +547,7 @@ namespace Mugi.Web.Controllers
                 }
                 else
                 {
-                    if (this.SubCategoriesService.CheckNameForInsert(viewModel.SubCategoryName,viewModel.CategoryId))
+                    if (this.SubCategoriesService.CheckNameForInsert(viewModel.SubCategoryName, viewModel.CategoryId))
                     {
                         return Json(new { status = "InsertFailed" });
                     }
@@ -590,8 +573,8 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public IActionResult AddSupplier(string supplierName)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             if (supplierName.Trim().Length > StaticValue.StaticValue.SUPPLIERNAME_LENGTH)
             {
                 return Json(new { Status = "Length" });
@@ -612,8 +595,8 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public IActionResult AddProperty(string propertyName)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             Property property = new Property();
             if (propertyName.Length > StaticValue.StaticValue.PROPERTYNAME_LENGTH)
             {
@@ -644,8 +627,8 @@ namespace Mugi.Web.Controllers
 
         public IActionResult AddPropertyDetails()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
 
             AddPropertyDetailsViewModel viewModel = new AddPropertyDetailsViewModel();
             var properties = this.PropertyService.GetAll();
@@ -656,8 +639,8 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public IActionResult AddPropertyDetails(AddPropertyDetailsViewModel viewModel)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             if (ModelState.IsValid)
             {
                 viewModel.PropertyValue = viewModel.PropertyValue.Trim();
@@ -701,8 +684,8 @@ namespace Mugi.Web.Controllers
 
         public IActionResult AddAdvertisement()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             return View();
         }
 
@@ -711,8 +694,8 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAdvertisement(AddAdvertisementViewModel viewModel)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             var file = viewModel.Image;
             var filePath = _hostingEnvironment.WebRootPath + "\\images\\ProductImages";
             SessionStaffModel session = HttpContext.Session.GetStaffSession("sessionStaff");
@@ -753,16 +736,16 @@ namespace Mugi.Web.Controllers
 
         public IActionResult GoodsReceipt()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             return View();
         }
 
         [HttpPost]
         public IActionResult GoodsReceipt([FromBody] List<GoodsReceiptModel> products)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             if (products.Any())
             {
                 GoodsReceipt goodsReceipt = new GoodsReceipt();
@@ -807,8 +790,8 @@ namespace Mugi.Web.Controllers
 
         public IActionResult RegisterStaff()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             return View();
         }
 
@@ -818,8 +801,8 @@ namespace Mugi.Web.Controllers
         public IActionResult RegisterStaff
             (RegisterStaffViewModel registerStaffViewModel)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             if (ModelState.IsValid)
             {
                 registerStaffViewModel.Account.UserName = registerStaffViewModel.Account.UserName.Trim();
@@ -871,65 +854,14 @@ namespace Mugi.Web.Controllers
         }
 
 
-        // GET: Login
-        public IActionResult LoginStaff()
-        {
-            return View();
-        }
 
-
-        // POST: Login
-        [HttpPost]
-        public IActionResult LoginStaff(LoginCustomerViewModel loginCustomerViewModel)
-        {
-            if (ModelState.IsValid)
-            {
-                loginCustomerViewModel.UserName = loginCustomerViewModel.UserName.Trim();
-                loginCustomerViewModel.Password = loginCustomerViewModel.Password.Trim();
-
-                var account = Mapper.Map<LoginCustomerViewModel, Account>(loginCustomerViewModel);
-                if (this.AccountService.Verify(account))
-                {
-                    var staff = this.StaffService.GetByUserName(account.UserName);
-                    if (staff != null)
-                    {
-                        SessionStaffModel session = HttpContext.Session.GetStaffSession("sessionStaff");
-                        if (session == null)
-                        {
-                            session = new SessionStaffModel();
-
-                        }
-                        session.StaffName = staff.Name;
-                        session.StaffId = staff.Id;
-                        //HttpContext.Session.SetSession("session", null);
-                        HttpContext.Session.SetSession("sessionStaff", session);
-                        HttpContext.Session.SetString("permission", staff.Account.Role.RoleName);
-                        return RedirectToAction("Index", "Staff");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("Password", "Tên tài khoản hoặc mật khẩu không đúng!");
-                        return View(loginCustomerViewModel);
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError("Password", "Tên tài khoản hoặc mật khẩu không đúng!");
-                    return View(loginCustomerViewModel);
-                }
-            }
-            else
-            {
-                return View(loginCustomerViewModel);
-            }
-        }
 
         //POST: UpdateProfile
         [HttpPost]
         public IActionResult StaffProfile(StaffProfileViewModel staffProfileViewModel)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             if (ModelState.IsValid)
             {
                 var staff = Mapper.Map<StaffProfileViewModel, Staff>(staffProfileViewModel);
@@ -954,8 +886,8 @@ namespace Mugi.Web.Controllers
         // GET: 
         public IActionResult StaffProfile()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             //CustomerModel customer = HttpContext.Session.GetCustomer("customer");
             SessionStaffModel session = HttpContext.Session.GetStaffSession("sessionStaff");
             //if (customer.Name != null)
@@ -973,8 +905,8 @@ namespace Mugi.Web.Controllers
         // GET: Logout
         public IActionResult LogoutStaff()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             HttpContext.Session.SetSession("sessionStaff", null);
             HttpContext.Session.SetSession("permission", null);
             return RedirectToAction("Index", "Staff");
@@ -985,8 +917,8 @@ namespace Mugi.Web.Controllers
         // GET: Change password
         public IActionResult ChangePassword()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             //var customer = HttpContext.Session.GetCustomer("customer");
             SessionStaffModel session = HttpContext.Session.GetStaffSession("sessionStaff");
             ChangePasswordViewModel changePasswordViewModel = new ChangePasswordViewModel();
@@ -1009,8 +941,8 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public IActionResult ChangePassword(ChangePasswordViewModel changePasswordViewModel)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             if (ModelState.IsValid)
             {
                 changePasswordViewModel.Password = changePasswordViewModel.Password.Trim();
@@ -1074,8 +1006,8 @@ namespace Mugi.Web.Controllers
 
         public IActionResult ListOrder()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             var session = HttpContext.Session.GetSession("session");
             if (session != null)
             {
@@ -1091,8 +1023,8 @@ namespace Mugi.Web.Controllers
 
         public IActionResult OrderDetails(int orderId)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             string status = this.OrderService.GetStatus(orderId);
             if (status == StaticValue.StaticValue.STATUS_HANDLING)
             {
@@ -1113,7 +1045,7 @@ namespace Mugi.Web.Controllers
             string status = this.OrderService.GetStatus(orderId);
             if (status == StaticValue.StaticValue.STATUS_CONFIRMED)
             {
-                
+
                 return View(GetDeliverViewModel(orderId));
             }
             else
@@ -1199,7 +1131,7 @@ namespace Mugi.Web.Controllers
 
         }
 
-      
+
 
         public IActionResult DenyOrder(int orderId)
         {
@@ -1218,7 +1150,7 @@ namespace Mugi.Web.Controllers
 
         public IActionResult Test()
         {
-            
+
             return View("Index");
         }
 
@@ -1286,8 +1218,8 @@ namespace Mugi.Web.Controllers
 
         public IActionResult ReturnProduct(int orderId)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             string status = this.OrderService.GetStatus(orderId);
             if (status == StaticValue.StaticValue.STATUS_COMPLETED)
             {
@@ -1345,8 +1277,8 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public IActionResult ReturnProduct([FromBody] ReturnProductModel model)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             if (ModelState.IsValid)
             {
                 int check = CheckBeforeReturnProduct(model);
@@ -1359,13 +1291,21 @@ namespace Mugi.Web.Controllers
                     returnProduct.StaffId = session.StaffId;
                     returnProduct.Reason = model.Reason;
                     returnProduct.ReturnProductSubProducts = new List<ReturnProductSubProduct>();
+                    bool flag = true;
                     foreach (var item in model.SubProducts)
                     {
-                        ReturnProductSubProduct rtsp = new ReturnProductSubProduct();
-                        rtsp.SubProductId = item.SubProductId;
-                        rtsp.Quantity = item.Quantity;
-                        returnProduct.ReturnProductSubProducts.Add(rtsp);
+                        if (item.Quantity > 0)
+                        {
+                            ReturnProductSubProduct rtsp = new ReturnProductSubProduct();
+                            rtsp.SubProductId = item.SubProductId;
+                            rtsp.Quantity = item.Quantity;
+                            returnProduct.ReturnProductSubProducts.Add(rtsp);
+                            flag = false;
+                        }
+
                     }
+                    if (flag) return Json("NoProductReturn");
+
                     if (this.ReturnProductService.Add(returnProduct))
                         return Json("Success");
                     else
@@ -1382,8 +1322,8 @@ namespace Mugi.Web.Controllers
 
         public IActionResult AddPromotion()
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             AddPromotionViewModel viewModel = new AddPromotionViewModel();
             var products = this.ProductService.GetAll();
             var list = Mapper.Map<IEnumerable<Product>, IEnumerable<ProductInPromotion>>(products);
@@ -1395,8 +1335,8 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public IActionResult AddPromotion(AddPromotionViewModel viewModel)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             if (ModelState.IsValid)
             {
 
@@ -1502,10 +1442,11 @@ namespace Mugi.Web.Controllers
                 return Json("");
         }
 
+        [ValidateAdmin]
         public IActionResult Export(int orderId)
         {
-            if (!CheckPermission())
-                return RedirectToAction(StaticValue.StaticValue.LOGIN_PAGE, StaticValue.StaticValue.CONTROLLER_LOGIN_PAGE);
+
+
             string status = this.OrderService.GetStatus(orderId);
             if (status == StaticValue.StaticValue.STATUS_DELIVERING)
             {
@@ -1527,13 +1468,104 @@ namespace Mugi.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Statistical(StatisticalViewModel viewModel)
+        public IActionResult Statistical(StatisticalModel model)
         {
-            viewModel.StatisticalTableModel = new StatisticalTableModel();
-            viewModel.StatisticalTableModel.Orders = OrderService
-                .GetStatistical(viewModel.StatisticalModel.StartDate, viewModel.StatisticalModel.EndDate);
-            return View(viewModel);
+            var orders = OrderService
+                .GetStatistical(model.StartDate, model.EndDate);
+
+            List<SubProductOrderStatistical> list = new List<SubProductOrderStatistical>();
+            foreach (var order in orders)
+            {
+                foreach (var orderSubProduct in order.OrderSubProducts)
+                {
+                    list.Add(new SubProductOrderStatistical
+                    {
+                        SubProductId = orderSubProduct.SubProductId,
+                        Quantity = orderSubProduct.Quantity,
+                        TotalSell = orderSubProduct.Order.OrderProducts
+                        .Where(x => x.ProductId == orderSubProduct.SubProduct.ProductId)
+                        .SingleOrDefault().Price * orderSubProduct.Quantity,
+                        ProductId = orderSubProduct.SubProduct.ProductId,
+                        TotalPay = GoodsReceiptSubProductService
+                        .GetTotalPay(orderSubProduct.SubProductId, orderSubProduct.Quantity)
+                    });
+                }
+            }
+
+            var result = list.GroupBy(x => x.ProductId)
+                .Select(x => new StatisticalTableModel
+                {
+                    ProductId = x.Key,
+                    ProductName = ProductService.GetProductById(x.Key).ProductName,
+                    TotalSell = x.Sum(y => y.TotalSell),
+                    Quantity = x.Sum(y => y.Quantity),
+                    TotalPay = x.Sum(y => y.TotalPay)
+                });
+
+            ViewBag.Table = result;
+
+            return View(model);
         }
+
+        //public IActionResult ShopOrder()
+        //{
+        //    ViewBag.Suppliers = Mapper.Map<IEnumerable<SupplierModel>>(SupplierService.GetAll());
+        //    return View();
+        //}
+
+        //[HttpPost]
+        //public IActionResult ShopOrder(List<int> productIds)
+        //{
+        //    var products = Mapper.Map<IEnumerable<ProductForGoodsReceiptModel>>(ProductService.GetForShopOrder(productIds.ToArray()));
+        //    return View("ChildShopOrder", products);
+        //}
+
+        //[HttpPost]
+        //public IActionResult SaveShopOrder(List<ShopOrderViewModel> model)
+        //{
+        //    ShopOrder shopOrder = new ShopOrder();
+        //    List<ShopOrderProduct> shopOrderProducts = new List<ShopOrderProduct>();
+        //    List<ShopOrderSubProduct> shopOrderSubProducts = new List<ShopOrderSubProduct>();
+        //    int supplierId = 0;
+        //    if (model[0] != null)
+        //    {
+        //        supplierId = ProductService.GetProductById(model[0].Id).SupplierId;
+        //    }
+        //    foreach (var item in model)
+        //    {
+        //        if (!item.SubProducts.Any(x => x.NumberProduct != 0) || item.PriceInput <= 0) continue;
+        //        var shopOrderProduct = new ShopOrderProduct { ProductId = item.Id, PriceInput = item.PriceInput };
+        //        foreach (var subItem in item.SubProducts)
+        //        {
+        //            if (subItem.NumberProduct == 0) continue;
+        //            shopOrderSubProducts.Add(new ShopOrderSubProduct
+        //            {
+        //                Quantity = subItem.NumberProduct,
+        //                SubProductId = subItem.Id
+        //            });
+        //        }
+        //        shopOrderProducts.Add(shopOrderProduct);
+        //    }
+        //    shopOrder.ShopOrderSubProducts = shopOrderSubProducts;
+        //    shopOrder.ShopOrderProducts = shopOrderProducts;
+        //    shopOrder.SupplierId = supplierId;
+        //    if (ShopOrderService.Save(shopOrder))
+        //    {
+        //        ViewBag.ShopOrderSuccess = true;
+        //    }
+        //    ViewBag.Suppliers = Mapper.Map<IEnumerable<SupplierModel>>(SupplierService.GetAll());
+        //    return View("ShopOrder");
+        //}
+
+
+        [HttpPost]
+        public IActionResult GetProductBySupplierId(int supplierId)
+        {
+            var products = Mapper.Map<IEnumerable<BasicProductModel>>(ProductService.GetAllProductsBySupplierId(supplierId));
+            return Json(products);
+        }
+
+
     }
 
 }
