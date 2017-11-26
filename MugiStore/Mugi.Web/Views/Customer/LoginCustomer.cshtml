@@ -25,18 +25,14 @@
 
         <div class="field">
             <label asp-for="UserName">Tên tài khoản</label>
-            <div class="field">
-                <input asp-for="UserName" class="insert-name">
+                <input asp-for="UserName" class="insert-name"><br />
                 <span asp-validation-for="UserName" class="error custom"></span>
-            </div>
         </div>
         <div class="field">
             <label asp-for="Password">Mật khẩu</label>
-            <div class="field">
-                <input asp-for="Password" type="password" class="insert-name">
+                <input asp-for="Password" type="password" class="insert-name"><br />
                 <span asp-validation-for="Password" class="error custom"></span>
 
-            </div>
         </div>
 
         <button class="ui button" type="submit">Đăng nhập</button>

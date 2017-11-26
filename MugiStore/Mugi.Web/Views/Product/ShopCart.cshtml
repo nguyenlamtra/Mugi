@@ -73,9 +73,9 @@
                         </div>
                     </th>
                     <th style="width:60%" class="center aligned"><h3>Sản phẩm</h3></th>
-                    <th class="center aligned"><h3>Đơn giá</h3></th>
+                    <th class="center aligned"><h3>Đơn giá (VNĐ)</h3></th>
                     <th class="center aligned"><h3>Số lượng</h3></th>
-                    <th class="center aligned"><h3>Thành tiền</h3></th>
+                    <th class="center aligned"><h3>Thành tiền (VNĐ)</h3></th>
 
                 </tr>
             </thead>
@@ -98,9 +98,6 @@
                                     </div>
                                     <div class="middle aligned content">
                                         <div class="header">
-                                            <h4>
-                                                Id: @item.SubProductId
-                                            </h4>
                                             <h4>
                                                 @item.ProductName
                                             </h4>
@@ -128,8 +125,8 @@
                             </div>
 
                         </td>
-                        <td class="center aligned priceProduct">
-                            @item.Price.ToString("#,## VNĐ")
+                        <td class="center aligned priceProduct" data-price="@item.Price">
+                            @item.Price.ToString("#,##")
                         </td>
                         <td class="center aligned">
                             <div class="ui scrolling dropdown">
@@ -198,16 +195,16 @@
             for (var i = 0; i < $listSubProducts.length; i++) {
                 var subProduct = $($listSubProducts[i]);
                 if (subProduct.find('.ui.checkbox').checkbox('is checked')) {
-                    var price = parseInt(subProduct.find('.priceProduct').text());
+                    var price = parseInt(subProduct.find('.priceProduct').data('price'));
                     var dropdown = subProduct.find('.ui.scrolling.dropdown');
                     var number = dropdown.dropdown('get value');
                     if (number == '') { number = 0; }
                     var totalPrice = subProduct.find('.totalPrice');
                     var promotion = parseInt(subProduct.find('.promotion').data('value'));
                     if (isNaN(promotion))
-                        totalPrice.text(number * price);
+                        totalPrice.text(thounsandsSeperator(number * price));
                     else
-                        totalPrice.text((number * price) - (number * price * promotion) / 100);
+                        totalPrice.text(thounsandsSeperator((number * price) - (number * price * promotion) / 100));
 
                     sum += isNaN(promotion) ? (number * price) : ((number * price) - (number * price * promotion) / 100);
                 } else {
@@ -216,8 +213,10 @@
                 }
             }
 
-            $('#sumMoney').text(sum);
+            $('#sumMoney').text(thounsandsSeperator(sum)+ ' VNĐ');
         }
+
+      
 
         $(document).ready(function () {
             $('.ui.basic.modal')
