@@ -27,8 +27,8 @@
 
                             <tr style="background: black;color: white;">
                                 <td>
-                                    <input type="hidden" name="[@k].Id" value="@products[k].Id"/>
-                                    
+                                    <input type="hidden" name="[@k].Id" value="@products[k].Id" />
+
                                     @products[k].ProductName
                                 </td>
                                 @for (int j = 0; j < Model.Max(x => x.Properties.Count); j++)
@@ -50,9 +50,21 @@
                                 <tr>
                                     @if (i == 0)
                                     {
-                                        <td><input name="[@k].PriceInput" type="number" /></td>
+                                        <td>
+                                            <div class="ui input">
+                                                <input placeholder="Đơn giá nhập" name="[@k].PriceInput" type="number" />
+                                            </div>
+                                        </td>
                                     }
-                                    else
+                                    @if (i == 1)
+                                    {
+                                        <td>
+                                            <div class="ui input">
+                                                <input placeholder="Đơn giá bán" name="[@k].PriceInput" type="number" />
+                                            </div>
+                                        </td>
+                                    }
+                                    @if(i!=0 && i!=1)
                                     {
                                         <td></td>
                                     }
@@ -72,9 +84,9 @@
                                         }
                                     }
                                     <td>
-                                        
+
                                         <div class="ui input">
-                                        <input name="[@k].SubProducts[@i].Id" type="hidden" value="@products[k].SubProducts[i].Id" />
+                                            <input name="[@k].SubProducts[@i].Id" type="hidden" value="@products[k].SubProducts[i].Id" />
                                             <input name="[@k].SubProducts[@i].NumberProduct" />
                                         </div>
                                     </td>

@@ -26,12 +26,22 @@ namespace Mugi.Service.Services
             decimal totalPay = 0;
             while (true)
             {
-                var goodsReceiptSubProduct = UnitOfWork.GoodsReceiptSubProductRepository
-                    .GetWithTakeAndSkip(skip, take, x => x.SubProductId == subProductId
-                    , includeProperties: "SubProduct,GoodsReceipt,GoodsReceipt.GoodsReceiptProducts").SingleOrDefault();
-                var goodsReceiptProduct = goodsReceiptSubProduct.GoodsReceipt
-                    .GoodsReceiptProducts.Where(x => x.ProductId == goodsReceiptSubProduct.SubProduct.ProductId).SingleOrDefault();
-                if (goodsReceiptSubProduct.Quantity < quantity && createDate > goodsReceiptSubProduct.GoodsReceipt.CreatedDate)
+                var goodsReceipts = UnitOfWork.GoodsReceiptRepository
+                    .GetWithTakeAndSkip(skip, take, x => x.CreatedDate < createDate &&
+                      x.GoodsReceiptSubProducts.Select(y => y.SubProductId).Contains(subProductId),
+                    includeProperties: "GoodsReceiptSubProducts,GoodsReceiptSubProducts.SubProduct,GoodsReceiptProducts",
+                    orderBy: x => x.OrderByDescending(y => y.CreatedDate)).SingleOrDefault();
+                var goodsReceiptSubProduct = goodsReceipts.GoodsReceiptSubProducts
+                    .Where(x => x.SubProductId == subProductId).FirstOrDefault();
+                var goodsReceiptProduct = goodsReceipts.GoodsReceiptProducts
+                    .Where(x => x.ProductId == goodsReceiptSubProduct.SubProduct.ProductId).SingleOrDefault();
+
+                //var goodsReceiptSubProduct = UnitOfWork.GoodsReceiptSubProductRepository
+                //    .GetWithTakeAndSkip(skip, take, x => x.SubProductId == subProductId
+                //    , includeProperties: "SubProduct,GoodsReceipt,GoodsReceipt.GoodsReceiptProducts").SingleOrDefault();
+                //var goodsReceiptProduct = goodsReceiptSubProduct.GoodsReceipt
+                //    .GoodsReceiptProducts.Where(x => x.ProductId == goodsReceiptSubProduct.SubProduct.ProductId).SingleOrDefault();
+                if (goodsReceiptSubProduct.Quantity < quantity)
                 {
                     totalPay += goodsReceiptSubProduct.Quantity * goodsReceiptProduct.PriceInsert;
                     quantity -= goodsReceiptSubProduct.Quantity;

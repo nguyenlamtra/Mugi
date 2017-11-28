@@ -1507,18 +1507,18 @@ namespace Mugi.Web.Controllers
             return View(model);
         }
 
-        //public IActionResult ShopOrder()
-        //{
-        //    ViewBag.Suppliers = Mapper.Map<IEnumerable<SupplierModel>>(SupplierService.GetAll());
-        //    return View();
-        //}
+        public IActionResult ShopOrder()
+        {
+            ViewBag.Suppliers = Mapper.Map<IEnumerable<SupplierModel>>(SupplierService.GetAll());
+            return View();
+        }
 
-        //[HttpPost]
-        //public IActionResult ShopOrder(List<int> productIds)
-        //{
-        //    var products = Mapper.Map<IEnumerable<ProductForGoodsReceiptModel>>(ProductService.GetForShopOrder(productIds.ToArray()));
-        //    return View("ChildShopOrder", products);
-        //}
+        [HttpPost]
+        public IActionResult ShopOrder(List<int> productIds)
+        {
+            var products = Mapper.Map<IEnumerable<ProductForGoodsReceiptModel>>(ProductService.GetForShopOrder(productIds.ToArray()));
+            return View("ChildShopOrder", products);
+        }
 
         //[HttpPost]
         //public IActionResult SaveShopOrder(List<ShopOrderViewModel> model)
