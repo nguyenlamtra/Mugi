@@ -295,7 +295,7 @@ namespace Mugi.Service.Services
                 .Get(x => x.Status == "Completed" && x.ConfirmDate >= StartTime 
                 && x.ConfirmDate <= EndTime, 
                 includeProperties: "OrderProducts,OrderProducts.Product" +
-                ",OrderSubProducts,OrderSubProducts.SubProduct").ToList();
+                ",OrderSubProducts,OrderSubProducts.SubProduct,ReturnProducts,ReturnProducts.ReturnProductSubProducts").ToList();
         }
     }
 }

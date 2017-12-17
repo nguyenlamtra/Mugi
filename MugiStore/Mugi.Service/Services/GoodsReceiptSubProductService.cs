@@ -8,7 +8,7 @@ namespace Mugi.Service.Services
 {
     public interface IGoodsReceiptSubProductService
     {
-        decimal GetTotalPay(int subProductId, int quantity, DateTime createDate);
+        decimal GetTotalPay(int orderId, int subProductId, int quantity, DateTime createDate);
     }
 
     public class GoodsReceiptSubProductService : IGoodsReceiptSubProductService
@@ -20,12 +20,13 @@ namespace Mugi.Service.Services
             UnitOfWork = unitOfWork;
         }
 
-        public decimal GetTotalPay(int subProductId, int quantity, DateTime createDate)
+        public decimal GetTotalPay(int orderId, int subProductId, int quantity, DateTime createDate)
         {
             int skip = 0, take = 1;
             decimal totalPay = 0;
             while (true)
             {
+              
                 var goodsReceipts = UnitOfWork.GoodsReceiptRepository
                     .GetWithTakeAndSkip(skip, take, x => x.CreatedDate < createDate &&
                       x.GoodsReceiptSubProducts.Select(y => y.SubProductId).Contains(subProductId),

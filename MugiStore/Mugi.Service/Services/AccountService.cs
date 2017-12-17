@@ -13,6 +13,7 @@ namespace Mugi.Service.Services
         Account GetById(int accountId);
         bool Update(Account account);
         int GetAccountIdByUserName(string userName);
+     
     }
     public class AccountService : IAccountService
     {
@@ -69,5 +70,6 @@ namespace Mugi.Service.Services
         {
             return this.UnitOfWork.AccountRepository.Get(x => x.UserName == userName).Select(x=>x.Id).SingleOrDefault();
         }
+
     }
 }

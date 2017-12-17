@@ -1478,16 +1478,29 @@ namespace Mugi.Web.Controllers
             {
                 foreach (var orderSubProduct in order.OrderSubProducts)
                 {
+                    int sumTemp = 0;
+                    var returnProducts = order.ReturnProducts;
+                    foreach (var returnProduct in returnProducts)
+                    {
+                        var temp = returnProduct.ReturnProductSubProducts;
+                        if (temp != null && temp.Select(x => x.SubProductId).Contains(orderSubProduct.SubProductId))
+                        {
+                            var i = temp.Where(x => x.SubProductId == orderSubProduct.SubProductId).SingleOrDefault();
+                            sumTemp += i.Quantity;
+                        }
+                    }
+                    var price = orderSubProduct.Order.OrderProducts
+                        .Where(x => x.ProductId == orderSubProduct.SubProduct.ProductId)
+                        .SingleOrDefault().Price;
                     list.Add(new SubProductOrderStatistical
                     {
                         SubProductId = orderSubProduct.SubProductId,
                         Quantity = orderSubProduct.Quantity,
-                        TotalSell = orderSubProduct.Order.OrderProducts
-                        .Where(x => x.ProductId == orderSubProduct.SubProduct.ProductId)
-                        .SingleOrDefault().Price * orderSubProduct.Quantity,
+                        TotalSell = price * orderSubProduct.Quantity - sumTemp * price,
                         ProductId = orderSubProduct.SubProduct.ProductId,
                         TotalPay = GoodsReceiptSubProductService
-                        .GetTotalPay(orderSubProduct.SubProductId, orderSubProduct.Quantity, orderSubProduct.Order.CreatedDate)
+                        .GetTotalPay(order.Id,orderSubProduct.SubProductId, 
+                        orderSubProduct.Quantity, orderSubProduct.Order.CreatedDate)
                     });
                 }
             }

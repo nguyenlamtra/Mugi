@@ -258,6 +258,7 @@ namespace Mugi.Web.Controllers
         //POST Add Cart
         public JsonResult AddCart([FromBody] ProductDetailsFilterViewModel filter)
         {
+            if (filter == null) return Json("failed");
             var product = this.ProductService.GetProductById(filter.ProductId);
             var properties = product.PropertyProducts.OrderBy(x => x.Property.PropertyName).Select(x => x.Property);
             var subProducts = product.SubProducts.Where(x => x.ProductLeft > 0);

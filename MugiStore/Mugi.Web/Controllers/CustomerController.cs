@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using AutoMapper;
 using Mugi.Web.Extensions;
 using Mugi.Web.Model.ViewModel;
+using System.Collections.Generic;
 
 namespace Mugi.Web.Controllers
 {
@@ -74,7 +75,7 @@ namespace Mugi.Web.Controllers
                         ModelState.AddModelError("Mail", "Mail đã tồn tại!");
                         return View(registerCustomerViewModel);
                     }
-                   
+
                 }
                 else
                 {
@@ -100,7 +101,7 @@ namespace Mugi.Web.Controllers
         [HttpPost]
         public IActionResult LoginCustomer(LoginCustomerViewModel loginCustomerViewModel)
         {
-            
+
             if (ModelState.IsValid)
             {
                 loginCustomerViewModel.UserName = loginCustomerViewModel.UserName.Trim();
@@ -109,21 +110,28 @@ namespace Mugi.Web.Controllers
                 if (this.AccountService.Verify(account))
                 {
                     var customer = this.CustomerService.GetByUserName(account.UserName);
-                    SessionModel session = HttpContext.Session.GetSession("session");
-                    if (customer != null)
+                    if (customer != null && customer.Account.Role.RoleName == StaticValue.StaticValue.PERMISSION_CUSTOMER)
                     {
-                       
-                        if (session != null)
-                        {
-                            session.CustomerName = customer.Name;
-                            session.CustomerId = customer.Id;
-                        }
-                        else
-                        {
-                            session = new SessionModel();
-                        }
+                        SessionModel session = HttpContext.Session.GetSession("session");
+                        List<ProductInSessionModel> products = session.Products ?? new List<ProductInSessionModel>();
+                        HttpContext.Session.Clear();
+
+                        //if (session != null)
+                        //{
+                        //    session.CustomerName = customer.Name;
+                        //    session.CustomerId = customer.Id;
+                        //}
+                        //else
+                        //{
+                        //    session = new SessionModel();
+                        //}
                         //HttpContext.Session.SetSession("sessionStaff", null);
-                        HttpContext.Session.SetSession("session", session);
+                        HttpContext.Session.SetSession("session", new SessionModel
+                        {
+                            Products = products,
+                            CustomerId = customer.Id,
+                            CustomerName = customer.Name
+                        });
                         HttpContext.Session.SetString("permission", customer.Account.Role.RoleName);
                         return RedirectToAction("HomePage", "Product");
                     }
@@ -132,8 +140,8 @@ namespace Mugi.Web.Controllers
                         ModelState.AddModelError("Password", "Tên tài khoản hoặc mật khẩu không đúng!");
                         return View(loginCustomerViewModel);
                     }
-                    
-                  
+
+
                 }
                 else
                 {
@@ -158,7 +166,7 @@ namespace Mugi.Web.Controllers
                 {
                     SessionModel session = HttpContext.Session.GetSession("session");
                     session.CustomerName = customer.Name;
-                    HttpContext.Session.SetSession("session",session);
+                    HttpContext.Session.SetSession("session", session);
                     return View(customerProfileViewModel);
                 }
                 else
@@ -192,8 +200,9 @@ namespace Mugi.Web.Controllers
         // GET: Logout
         public IActionResult LogoutCustomer()
         {
-            HttpContext.Session.SetSession("session", null);
-            HttpContext.Session.SetSession("permission", null);
+            HttpContext.Session.Clear();
+            //HttpContext.Session.SetSession("session", null);
+            //HttpContext.Session.SetSession("permission", null);
             return RedirectToAction("HomePage", "Product");
         }
 
